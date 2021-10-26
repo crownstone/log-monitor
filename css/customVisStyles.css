@@ -1,0 +1,28 @@
+.vis-item.unconnected {
+    background-color: #ddd;
+    border-width:0px
+}
+.vis-item.connected {
+    background-color: #b1eb76;
+    border-width:1px;
+    border-color: #9dd169;
+}
+.vis-item.connecting {
+    background-color: #5deaff;
+    border-width:0px
+}
+.vis-item.connectingFailed {
+    background-color: #eea23b;
+    border-width:1px;
+    border-color: #80571f;
+}
+.vis-item.commandExecuted {
+    background-color: #4b8d00;
+    border-width:1px;
+    border-color: #4b8d00;
+}
+.vis-item.ERROR {
+    background-color: #7e0000;
+    border-width:1px;
+    border-color: #4f0000;
+}
