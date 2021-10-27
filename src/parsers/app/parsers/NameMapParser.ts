@@ -7,13 +7,13 @@ export class NameMapParser extends BaseParser {
   data = {};
 
   load(item) {
-    let rebootDetected = item[1].match(nameMap);
-    if (rebootDetected) {
-      // this.data.push([item[0]-1,this.reboots++])
+    let mapDetected = item[1].match(nameMap);
+    if (mapDetected) {
+      this.data = mapDetected[2]
     }
   }
 
   export() {
-    this._exportData['nameMap'] = this.data;
+    // this._exportData['nameMap'] = JSON.parse(this.data);
   }
 }

@@ -1,11 +1,7 @@
-import {preProcessConsumerApp, preProcessIOSLib} from "./util";
-import {gatherEventStatistics} from "./app/event_statistics";
-import {gatherConstellationStatistics} from "./app/constellation_statistics";
-import {ramParser} from "./libs/ios/batteryRam";
 import {RebootParser} from "./app/parsers/RebootParser";
 import {ConstellationParser} from "./app/parsers/ConstellationParser";
-import {FileUtil} from "../src/util/FileUtil";
 import {NameMapParser} from "./app/parsers/NameMapParser";
+import {FileUtil} from "../util/FileUtil";
 
 const readline = require('readline');
 const path = require('path');
@@ -62,7 +58,7 @@ const fs = require("fs")
 //   }
 // }
 
-export function parseConsumerAppFileByLine(user, date, result) {
+export function parseConsumerAppFileByLine(user, date, result, maxLines: number = 0) {
   return new Promise<void>((resolve, reject) => {
     const file = FileUtil.getFileStream(user, date)
 
@@ -71,12 +67,19 @@ export function parseConsumerAppFileByLine(user, date, result) {
       new ConstellationParser(result),
       new NameMapParser(result),
     ]
+    let total = 0;
     file.on('line', (line) => {
       if (!line) return;
+      if (maxLines > 0 && total++ > maxLines) {
+        return;
+      }
+
+
       let item = [Number(line.substr(0,13)), line];
       for (let parser of parsers) {
         parser.load(item);
       }
+
     });
 
     file.on("close", () => {

@@ -7,7 +7,6 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 export const getStaticProps: GetStaticProps = async (context) => {
   let paths = FileUtil.getUsers()
-  console.log(paths)
   return {
     props: {title:"Available files", data: paths},
   }

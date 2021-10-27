@@ -14,7 +14,7 @@
 .vis-item.connectingFailed {
     background-color: #eea23b;
     border-width:1px;
-    border-color: #80571f;
+    border-color: #d48435;
 }
 .vis-item.commandExecuted {
     background-color: #4b8d00;
