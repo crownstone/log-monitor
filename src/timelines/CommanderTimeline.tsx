@@ -3,7 +3,7 @@ import * as vis from "vis-timeline/standalone/umd/vis-timeline-graph2d";
 import {Backdrop, Paper} from "@mui/material";
 import {CommanderPhaseTimeline} from "./CommanderPhaseTimeline";
 
-export class CommanderTimeline extends React.Component<{ data: any }, { overlayContent: any | null }> {
+export class CommanderTimeline extends React.Component<{ data: ParseDataResult }, { overlayContent: any | null }> {
 
   timeline;
 
@@ -26,6 +26,8 @@ export class CommanderTimeline extends React.Component<{ data: any }, { overlayC
     let total = 0;
     let constellation = this.props.data.constellation;
     let reboots = this.props.data.reboots;
+    let nameMap = this.props.data;
+
     let groups = {};
 
     let viewMap = {
@@ -48,12 +50,10 @@ export class CommanderTimeline extends React.Component<{ data: any }, { overlayC
       //   continue;
       // }
 
-
       items.push({id: commanderId, start: commander.tStart, end: commander.tEnd});
-      console.log(commander)
       total++;
 
-      if (total > 10000) {
+      if (total > 1000000) {
         lastT = Math.max(commander.tEnd, lastT);
         console.log("Stopped prematurely.", new Date(lastT))
         break;
@@ -69,6 +69,8 @@ export class CommanderTimeline extends React.Component<{ data: any }, { overlayC
 
     // Configuration for the Timeline
     var options = {
+      minHeight: 600,
+      cluster: { maxItems: 30 }
       // stack: false
     };
 
@@ -88,17 +90,15 @@ export class CommanderTimeline extends React.Component<{ data: any }, { overlayC
     this.timeline.on('select', (properties) => {
       if (properties.items) {
         if (constellation.commanders[properties.items]?.phases) {
-          this.setState({overlayContent: <CommanderPhaseTimeline data={constellation.commanders[properties.items]}/>});
+          this.setState({overlayContent: <CommanderPhaseTimeline commanderId={properties.items} data={this.props.data}/>});
         }
       }
     });
-    console.log("Connecting Count", connectingCount)
-    console.log("Connected Count", connectCount)
   }
 
   render() {
     return (
-      <div style={{width:'100%',height:'100%'}}>
+      <div style={{width:'100%',height:'100%', maxHeight: '100vh'}}>
         <div ref={'viscontainer'} />
         <Backdrop open={this.state.overlayContent !== null} style={{zIndex:99999}} onClick={() => { this.setState({overlayContent: null})}}>
           <Paper style={{maxHeight: '90vh', overflow:'auto', padding:20, width: '60vw'}} onClick={(event) => { event.stopPropagation() }}>{ this.state.overlayContent }</Paper>

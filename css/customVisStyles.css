@@ -3,6 +3,17 @@
     border-width:0px
 }
 .vis-item.connected {
+    background-color: #4b8d00;
+    border-width:1px;
+    border-color: #4b8d00;
+}
+
+.vis-item.commandExecuted {
+    background-color: #b1eb76;
+    border-width:1px;
+    border-color: #9dd169;
+}
+.vis-item.performedCommandSuccess {
     background-color: #b1eb76;
     border-width:1px;
     border-color: #9dd169;
@@ -16,10 +27,10 @@
     border-width:1px;
     border-color: #d48435;
 }
-.vis-item.commandExecuted {
-    background-color: #4b8d00;
+.vis-item.performedCommandFailed {
+    background-color: #eea23b;
     border-width:1px;
-    border-color: #4b8d00;
+    border-color: #d48435;
 }
 .vis-item.ERROR {
     background-color: #7e0000;

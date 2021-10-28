@@ -7,7 +7,7 @@ import {CommanderTimeline} from "../src/timelines/CommanderTimeline";
 export const getStaticProps: GetStaticProps = async (context) => {
   console.time("Parsing")
   let result = {};
-  await parseConsumerAppFileByLine('Alex','2021-10-27', result, 10000)
+  await parseConsumerAppFileByLine('Alex','2021-10-28', result)
   console.timeEnd("Parsing")
   return {
     props: {title:"Constellation", data: result},

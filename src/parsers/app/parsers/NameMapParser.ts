@@ -1,19 +1,28 @@
 import {BaseParser} from "./BaseParser";
 
-let nameMap = /Initializing Logprocessor./
+let nameMap = /MapProvider: logMap\W*(\[.*\])"]/
 
 export class NameMapParser extends BaseParser {
 
-  data = {};
+  data = [];
 
   load(item) {
     let mapDetected = item[1].match(nameMap);
     if (mapDetected) {
-      this.data = mapDetected[2]
+      let jsonDestringified = mapDetected[1].replace(/\\/g,'');
+      this.data = JSON.parse(jsonDestringified);
     }
   }
 
   export() {
-    // this._exportData['nameMap'] = JSON.parse(this.data);
+    let resultMap = {};
+    for (let point of this.data) {
+      if (point.handle) {
+        resultMap[point.handle.toLowerCase()] = point
+      }
+    }
+
+
+    this._exportData['nameMap'] = resultMap;
   }
 }

@@ -17,9 +17,9 @@ afterAll(async () => {})
 test("experiment", async () => {
   let result : any = {};
   console.time("parseStart")
-  await parseConsumerAppFileByLine('Alex', '2021-10-27', result, 2000);
+  await parseConsumerAppFileByLine('Alex', '2021-10-28', result);
   console.timeEnd("parseStart")
-  let commanders = result.constellation.commanders;
+  let commanders = result.constellation.sessions;
   for (let commanderId in commanders) {
     console.log(commanders[commanderId].phases)
   }

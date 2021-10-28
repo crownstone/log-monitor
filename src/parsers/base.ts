@@ -74,7 +74,6 @@ export function parseConsumerAppFileByLine(user, date, result, maxLines: number 
         return;
       }
 
-
       let item = [Number(line.substr(0,13)), line];
       for (let parser of parsers) {
         parser.load(item);

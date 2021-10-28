@@ -3,8 +3,9 @@ import {SessionPhases} from "../parsers/app/parsers/ConstellationParser";
 import * as vis from "vis-timeline/standalone/umd/vis-timeline-graph2d";
 import {SessionPhaseTimeline} from "./SessionPhaseTimeline";
 import {Backdrop, Paper} from "@mui/material";
+import {getGroupName} from "../parsers/util";
 
-export class SessionTimeline extends React.Component<{ data: any }, { overlayContent: any | null }> {
+export class SessionTimeline extends React.Component<{ data: ParseDataResult }, { overlayContent: any | null }> {
 
   timeline;
 
@@ -32,7 +33,7 @@ export class SessionTimeline extends React.Component<{ data: any }, { overlayCon
 
     let viewMap = {
       unconnected:      false,
-      connecting:       false,
+      connecting:       true,
       connectingFailed: true,
       connected:        true,
       commandExecuted:  true,
@@ -60,30 +61,32 @@ export class SessionTimeline extends React.Component<{ data: any }, { overlayCon
         connectCount++;
       }
       if (session.properties[SessionPhases.performCommand]) {
-        className = 'commandExecuted'
+        className = 'commandExecuted';
       }
       if (!session.properties[SessionPhases.ended]) {
-        className = 'ERROR'
+        className = 'ERROR';
       }
 
-      groups[session.handle] = {id: session.handle, content: session.handle};
+      let groupName = getGroupName(nameMap, session.handle);
+
+      groups[groupName] = {id: groupName, content: groupName};
       if (viewMap[className] === false) {
         continue;
       }
 
 
-      items.push({id: sessionId, start: session.tStart, end: session.tEnd, group: session.handle, className: className});
+      items.push({id: sessionId, start: session.tStart, end: session.tEnd, group: groupName, className: className});
       total++;
 
       if (total > 10000) {
         lastT = Math.max(session.tEnd, lastT);
-        console.log("Stopped prematurely.", new Date(lastT))
+        console.log("Stopped prematurely.", new Date(lastT));
         break;
       }
     }
 
-    console.timeEnd("PreparingData")
-    console.time("Loading")
+    console.timeEnd("PreparingData");
+    console.time("Loading");
 
     // Create a DataSet (allows two way data-binding)
     this.itemsDataset = new vis.DataSet(items);
@@ -112,7 +115,7 @@ export class SessionTimeline extends React.Component<{ data: any }, { overlayCon
     this.timeline.on('select', (properties) => {
       if (properties.items) {
         if (constellation.sessions[properties.items]?.phases) {
-          this.setState({overlayContent: <SessionPhaseTimeline data={constellation.sessions[properties.items].phases}/>});
+          this.setState({overlayContent: <SessionPhaseTimeline sessionId={properties.items} data={constellation}/>});
         }
       }
     });
@@ -122,7 +125,7 @@ export class SessionTimeline extends React.Component<{ data: any }, { overlayCon
 
   render() {
     return (
-      <div style={{width:'100%',height:'100%'}}>
+      <div style={{width:'100%'}}>
         <div ref={'viscontainer'} />
         <Backdrop open={this.state.overlayContent !== null} style={{zIndex:99999}} onClick={() => { this.setState({overlayContent: null})}}>
           <Paper style={{maxHeight: '90vh', overflow:'auto', padding:20, width: '60vw'}} onClick={(event) => { event.stopPropagation() }}>{ this.state.overlayContent }</Paper>

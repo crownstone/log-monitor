@@ -1,9 +1,10 @@
 import React from "react";
 import * as vis from "vis-timeline/standalone/umd/vis-timeline-graph2d";
 import {TimelineOptions} from "vis-timeline/types";
+import {getGroupName} from "../parsers/util";
 
 
-export class CommanderPhaseTimeline extends React.Component<{ data: any }, any> {
+export class CommanderPhaseTimeline extends React.Component<{ data: ParseDataResult, commanderId }, any> {
 
   timeline;
   itemsDataset = null;
@@ -14,16 +15,19 @@ export class CommanderPhaseTimeline extends React.Component<{ data: any }, any> 
   }
 
   init() {
+
     const { viscontainer } = this.refs;
     let items = [];
     let startT = Infinity;
     let endT = -Infinity;
-    let phases = this.props.data.phases;
-    let commands = this.props.data.commands;
+    let constellation = this.props.data.constellation;
+    let commander = constellation.commanders;
+    let phases = commander[this.props.commanderId].phases;
+    let commands = constellation.commands;
     for (let phase of phases) {
       let label = phase.label;
       if (phase.commandId) {
-        label += "<br/>" + commands[phase.commandId].data.command.type + " to <br />" + phase.data.handle;
+        label += "<br/>" + commands[phase.commandId].data.command.type + " to <br />" + getGroupName(this.props.data.nameMap, phase.data.handle);
       }
       startT = Math.min(startT, phase.time);
       endT = Math.max(endT, phase.time);

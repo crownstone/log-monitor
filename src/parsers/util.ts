@@ -40,3 +40,12 @@ export function preProcessConsumerApp(data: string) {
   }
   return result;
 }
+
+
+export function getGroupName(nameMap : {[handle: string]: StoneMap}, handle : string) : string {
+  let map = nameMap[handle.toLowerCase()];
+  if (map === undefined) { return handle; }
+
+
+  return `${map.cid}: ${map.name} in ${map.locationName}`;
+}

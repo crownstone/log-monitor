@@ -65,17 +65,24 @@ export const SessionPhases = {
  disconnectedRetry:    'session_disconnectedRetry',
  disconnected:         'session_disconnected',
 }
+export const CommandPhases = {
+  created    : 'created',
+  performing : 'performing',
+  succeeded  : 'succeeded',
+  failed     : 'failed',
+  duplicate  : 'duplicate',
+}
 
 let sessionParsers = [
   {type:'commander',     label:'created',           mapping: [{targets:(d) => { return d.replace(/"/,'').split(",")}},'commanderId'], regex:/Commander: Created for target",\[*([\w\-,"]*)\W*,"id:","([\w-]*)/},
   {type:'commander',     label:'loadAction',        mapping: [{targets:(d) => { return d.replace(/"/,'').split(",")}},'commanderId'], regex:/Commander: Loading command",\[*([\w\-,"]*)\W*,"id:","([\w-]*)/},
   {type:'commander',     label:'failure',           mapping: [{targets:(d) => { return d.replace(/"/,'').split(",")}},'commanderId'], regex:/Commander: Failed to load command",\[*([\w\-,"]*)\W*,"id:","([\w-]*)/},
 
-  {type:'command',       label: 'created',          mapping: [{command: (d) => { d = d.replace(/\\/g,''); return JSON.parse(d); }}],  regex:/BleCommandManager: Loading command\W*({.*})"]/},
-  {type:'command',       label: 'performing',       mapping: ['commandType', 'handle', 'commandId'],                                  regex:/BleCommandManager: Performing command\W*(\w*)\W*on\W*([\w-]*)\W*([\w-]*)/},
-  {type:'command',       label: 'succeeded',        mapping: ['commandType', 'handle', 'commandId'],                                  regex:/BleCommandManager: Succeeded command\W*(\w*)\W*on\W*([\w-]*)\W*([\w-]*)/},
-  {type:'command',       label: 'failed',           mapping: ['commandType', 'handle', 'error', 'commandId'],                         regex:/BleCommandManager: Something went wrong while performing\W*(\w*)\W*([\w-]*)\W*,([\w-]*)\W*([\w-]*)/},
-  {type:'command',       label: 'duplicate',        mapping: ['removedCommandId', 'commandId', 'commandType','commandTargetType', 'commanderId'], regex:/BleCommandCleaner: Removed command due to duplicate\W*([\w-]*)\W*([\w-]*)\W*([\w-]*)\W*([\w-]*)\W*([\w-]*)/},
+  {type:'command',       label:CommandPhases.created,    mapping: [{command: (d) => { d = d.replace(/\\/g,''); return JSON.parse(d); }}],  regex:/BleCommandManager: Loading command\W*({.*})"]/},
+  {type:'command',       label:CommandPhases.performing, mapping: ['commandType', 'handle', 'commandId'],                                  regex:/BleCommandManager: Performing command\W*(\w*)\W*on\W*([\w-]*)\W*([\w-]*)/},
+  {type:'command',       label:CommandPhases.succeeded,  mapping: ['commandType', 'handle', 'commandId'],                                  regex:/BleCommandManager: Succeeded command\W*(\w*)\W*on\W*([\w-]*)\W*([\w-]*)/},
+  {type:'command',       label:CommandPhases.failed,     mapping: ['commandType', 'handle', 'error', 'commandId'],                         regex:/BleCommandManager: Something went wrong while performing\W*(\w*)\W*([\w-]*)\W*,([\w-]*)\W*([\w-]*)/},
+  {type:'command',       label:CommandPhases.duplicate,  mapping: ['removedCommandId', 'commandId', 'commandType','commandTargetType', 'commanderId'], regex:/BleCommandCleaner: Removed command due to duplicate\W*([\w-]*)\W*([\w-]*)\W*([\w-]*)\W*([\w-]*)\W*([\w-]*)/},
 
   {type:'sessionBroker', label: 'requesting',       mapping: ["handle", "commanderId", "privateRequest", "commandType"], regex:/SessionBroker: actually requesting session\W*"([\w-]*)"\W*for\W*([\w-]*).*private\W*(\w*)\W*commandType\W*([\w-]*)/},
   {type:'sessionBroker', label: 'connected',        mapping: ["handle", "commanderId"], regex:/SessionBroker: Session has connected to\W*([\w-]*)\W*for\W*([\w-]*)/,   },
@@ -107,7 +114,7 @@ let sessionParsers = [
 
 class SessionCollector {
 
-  data = {}
+  data : SessionData = {}
 
   collect(item, parser, parseResult: any) {
     if (parseResult.sessionId) {
@@ -127,10 +134,11 @@ class SessionCollector {
 
 class CommanderCollector {
 
-  commanderData = {}
-  handleMap = {}
-  commandId2CommanderIdMap = {}
-  commandData = {};
+  commanderData : CommanderData = {}
+  handleMap : HandleToCommandMap = {}
+  commandId2CommanderIdMap : CommandIdToCommanderIdMap = {}
+  commandId2CommandMap : CommandIdToCommandMap = {}
+  commandData : CommandData = {};
 
   collect(item, parser, parseResult: any) {
     if (parseResult.commanderId) {
@@ -149,43 +157,54 @@ class CommanderCollector {
     let command = parseResult.command;
 
     let commanderId = null;
+    let commandId = null;
     // this is the first creation of the command.
     if (command) {
       commanderId = command.commanderId;
-      this.commandId2CommanderIdMap[command.id] = command.commanderId;
+      commandId   = command.id;
+      
+      this.commandId2CommanderIdMap[commandId] = command.commanderId;
 
       if (this.commanderData[commanderId] === undefined) {
-        console.log("Missing commander", commanderId)
+        console.log("Missing commander", commanderId);
         return;
       }
-      if (this.commanderData[commanderId].commands[command.id] === undefined) {
-        this.commanderData[commanderId].commands[command.id] = {data: command, phases: [{time: item[0], label: parser.label}]};
+      if (this.commanderData[commanderId].commands[commandId] === undefined) {
+        this.commanderData[commanderId].commands[commandId] = {
+          data: command,
+          phases: [{time: item[0], label: parser.label}],
+          properties: {[parser.label]: parseResult}
+        };
       }
 
-      if (this.commandData[command.id] === undefined) {
-        this.commandData[command.id] = { time: item[0], phases: [{time: item[0], label: parser.label}] }
+      if (this.commandData[commandId] === undefined) {
+        this.commandData[commandId] = { data: command, phases: [{time: item[0], label: parser.label}], properties: {} }
       }
 
       if (this.handleMap[command.commandTarget] === undefined) {
         this.handleMap[command.commandTarget] = [];
       }
-      this.handleMap[command.commandTarget].push({time: item[0], commandId: command.id})
+      this.handleMap[command.commandTarget].push({time: item[0], commandId: commandId})
+      this.commandId2CommandMap[commandId] = this.commanderData[commanderId].commands[commandId];
     }
 
     if (parseResult.commandId) {
-      commanderId = this.commandId2CommanderIdMap[parseResult.commandId];
+      commandId   = parseResult.commandId;
+      commanderId = this.commandId2CommanderIdMap[commandId];
       if (this.commanderData[commanderId] === undefined) {
         return;
       }
-
-      this.commanderData[commanderId].phases.push({time:item[0], label: 'command_' + parser.label, commandId: parseResult.commandId, data: parseResult});
-      this.commanderData[commanderId].commands[parseResult.commandId].phases.push({time:item[0], label: parser.label, data: parseResult});
+      this.commanderData[commanderId].phases.push({time:item[0], label: 'command_' + parser.label, commandId: commandId, data: parseResult});
       this.commandData[parseResult.commandId].phases.push({time: item[0], label: parser.label});
     }
 
     if (commanderId) {
-      this.commanderData[commanderId].tStart = Math.min( this.commanderData[commanderId].tStart, item[0])
-      this.commanderData[commanderId].tEnd   = Math.max( this.commanderData[commanderId].tEnd, item[0])
+      this.commanderData[commanderId].tStart = Math.min( this.commanderData[commanderId].tStart, item[0]);
+      this.commanderData[commanderId].tEnd   = Math.max( this.commanderData[commanderId].tEnd, item[0]);
+      if (commandId) {
+        this.commanderData[commanderId].commands[commandId].properties[parser.label] = parseResult;
+        this.commanderData[commanderId].commands[commandId].phases.push({time:item[0], label: parser.label, data: parseResult});
+      }
     }
   }
 
@@ -216,11 +235,12 @@ export class ConstellationParser extends BaseParser {
 
   export() {
     this._exportData['constellation'] = {
-      sessions: this.sessionCollector.data,
+      sessions:   this.sessionCollector.data,
       commanders: this.commanderCollector.commanderData,
-      commands: this.commanderCollector.commandData,
+      commands:   this.commanderCollector.commandData,
       maps: {
-        handle2commandMap: this.commanderCollector.handleMap,
+        commandId2commandMap: this.commanderCollector.commandId2CommandMap,
+        handle2commandMap:    this.commanderCollector.handleMap,
       }
     }
   }
