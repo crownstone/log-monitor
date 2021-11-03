@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import { GetStaticProps } from 'next'
-import {Button, Container, Grid, Paper} from "@mui/material";
+import {Button, Container, Grid, Paper, useMediaQuery} from "@mui/material";
 import {FileUtil} from "../src/util/FileUtil";
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
@@ -12,7 +12,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
   }
 }
 
-export default class FileOverview extends React.Component<{data: any}, any> {
+export default class FileOverview extends React.Component<any, any> {
 
   constructor(params) {
     super(params);
@@ -29,10 +29,14 @@ export default class FileOverview extends React.Component<{data: any}, any> {
 
 
   render() {
+    let hidden = false
+    // let hidden = useMediaQuery(theme => theme.breakpoints.up('xl'));
     return (
-      <Grid container flexDirection={'column'}>
-        <h1>Available Log files</h1>
-        { this.getItems() }
+      <Grid container flexDirection={'column'} style={{backgroundColor:'red'}}>
+        {hidden === false && <Grid item>
+          <h1>Available Log files</h1>
+          { this.getItems() }
+        </Grid>}
       </Grid>
 
     );

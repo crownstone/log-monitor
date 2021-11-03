@@ -1,7 +1,6 @@
 import React from "react";
 import { GetStaticProps } from 'next'
 import {parseConsumerAppFileByLine} from "../src/parsers/base";
-import {SessionTimeline} from "../src/timelines/SessionTimeline";
 import {CommanderTimeline} from "../src/timelines/CommanderTimeline";
 
 export const getStaticProps: GetStaticProps = async (context) => {

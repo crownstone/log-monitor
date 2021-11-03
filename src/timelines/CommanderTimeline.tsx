@@ -2,98 +2,54 @@ import React from "react";
 import * as vis from "vis-timeline/standalone/umd/vis-timeline-graph2d";
 import {Backdrop, Paper} from "@mui/material";
 import {CommanderPhaseTimeline} from "./CommanderPhaseTimeline";
+import {EventBusClass} from "../util/EventBus";
+import {DataFlowTimeline} from "./DataFlowTimeline";
+import {SessionDataFlowManager} from "../logic/DataFlowManager_sessions";
+import {SessionPhaseTimeline} from "./SessionPhaseTimeline";
+import {CommanderDataFlowManager} from "../logic/DataFlowManager_commanders";
 
-export class CommanderTimeline extends React.Component<{ data: ParseDataResult }, { overlayContent: any | null }> {
+export class CommanderTimeline extends React.Component<{ data: ParseDataResult, eventBus: EventBusClass }, { overlayContent: any | null }> {
 
-  timeline;
-
-  itemsDataset = null;
-  groupsDataset = null;
+  dataFlowTimeline: DataFlowTimeline;
+  dataFlowManager: CommanderDataFlowManager;
 
   constructor(params) {
     super(params);
     this.state = {overlayContent: null};
-    // console.log(this.props.data)
+    this.dataFlowManager = new CommanderDataFlowManager();
+    this.dataFlowTimeline = new DataFlowTimeline(this.dataFlowManager, this.props.eventBus);
   }
 
   componentDidMount() {
     const { viscontainer } = this.refs;
-    console.time("PreparingData")
-    // console.log(this.props.data)
 
-    let items = [];
-    let commander;
-    let total = 0;
-    let constellation = this.props.data.constellation;
-    let reboots = this.props.data.reboots;
-    let nameMap = this.props.data;
+    console.time("PreparingData");
+    this.dataFlowManager.load(this.props.data);
+    console.timeEnd("PreparingData");
 
-    let groups = {};
-
-    let viewMap = {
-      unconnected:      false,
-      connecting:       false,
-      connectingFailed: true,
-      connected:        true,
-      commandExecuted:  true,
-      ERROR:            true,
-    }
-
-    let lastT = 0
-    let connectCount = 0;
-    let connectingCount = 0;
-
-    for (let commanderId in constellation.commanders) {
-      commander = constellation.commanders[commanderId];
-      // groups[session.handle] = {id: session.handle, content: session.handle};
-      // if (viewMap[className] === false) {
-      //   continue;
-      // }
-
-      items.push({id: commanderId, start: commander.tStart, end: commander.tEnd});
-      total++;
-
-      if (total > 1000000) {
-        lastT = Math.max(commander.tEnd, lastT);
-        console.log("Stopped prematurely.", new Date(lastT))
-        break;
-      }
-    }
-
-    console.timeEnd("PreparingData")
-    console.time("Loading")
-
-    // Create a DataSet (allows two way data-binding)
-    this.itemsDataset = new vis.DataSet(items);
-    this.groupsDataset = new vis.DataSet(Object.values(groups));
+    console.time("GettingData");
+    this.dataFlowManager.getAll();
+    console.timeEnd("GettingData");
 
     // Configuration for the Timeline
-    var options = {
+    let options = {
       minHeight: 600,
-      cluster: { maxItems: 30 }
-      // stack: false
+      cluster: { maxItems: 20 },
     };
 
-    console.timeEnd("Loading")
-    // Create a Timeline
-    this.timeline = new vis.Timeline(viscontainer as HTMLElement, this.itemsDataset, options);
-    if (lastT > 0) {
-      let markerId = 'ABORT_MARKER';
-      this.timeline.addCustomTime(new Date(lastT),markerId, false);
-      this.timeline.setCustomTimeMarker("Stopped drawing new items.",markerId, false);
-    }
-    for (let reboot of reboots) {
-      let markerId = 'reboot' + reboot[1];
-      this.timeline.addCustomTime(new Date(reboot[0]), markerId, false);
-      this.timeline.setCustomTimeMarker("Reboot",markerId, false);
-    }
-    this.timeline.on('select', (properties) => {
+    this.dataFlowTimeline.create(viscontainer, options)
+    this.dataFlowTimeline.on('select', (properties) => {
       if (properties.items) {
-        if (constellation.commanders[properties.items]?.phases) {
+        if (this.props.data.constellation.commanders[properties.items]?.phases) {
           this.setState({overlayContent: <CommanderPhaseTimeline commanderId={properties.items} data={this.props.data}/>});
         }
       }
     });
+  }
+
+  componentWillUnmount() {
+    this.dataFlowManager.destroy();
+    this.dataFlowTimeline.destroy();
   }
 
   render() {
@@ -101,7 +57,7 @@ export class CommanderTimeline extends React.Component<{ data: ParseDataResult }
       <div style={{width:'100%',height:'100%', maxHeight: '100vh'}}>
         <div ref={'viscontainer'} />
         <Backdrop open={this.state.overlayContent !== null} style={{zIndex:99999}} onClick={() => { this.setState({overlayContent: null})}}>
-          <Paper style={{maxHeight: '90vh', overflow:'auto', padding:20, width: '60vw'}} onClick={(event) => { event.stopPropagation() }}>{ this.state.overlayContent }</Paper>
+          <Paper style={{maxHeight: '100vh', overflow:'auto', padding:20, width: '90vw'}} onClick={(event) => { event.stopPropagation() }}>{ this.state.overlayContent }</Paper>
         </Backdrop>
       </div>
     );

@@ -61,36 +61,54 @@ export const SessionPhases = {
  ended:                'session_ended',
  disconnectingCommand: 'session_disconnectingCommand',
  disconnectingPhone:   'session_disconnectingPhone',
- disconnectPromiseDone: 'disconnectPromiseDone',
+ disconnectPromiseDone: 'session_disconnectPromiseDone',
  disconnectedRetry:    'session_disconnectedRetry',
  disconnected:         'session_disconnected',
 }
 export const CommandPhases = {
-  created    : 'created',
-  performing : 'performing',
-  succeeded  : 'succeeded',
-  failed     : 'failed',
-  duplicate  : 'duplicate',
+  created    : 'command_created',
+  performing : 'command_performing',
+  succeeded  : 'command_succeeded',
+  failed     : 'command_failed',
+  duplicate  : 'command_duplicate',
 }
 
-let sessionParsers = [
-  {type:'commander',     label:'created',           mapping: [{targets:(d) => { return d.replace(/"/,'').split(",")}},'commanderId'], regex:/Commander: Created for target",\[*([\w\-,"]*)\W*,"id:","([\w-]*)/},
-  {type:'commander',     label:'loadAction',        mapping: [{targets:(d) => { return d.replace(/"/,'').split(",")}},'commanderId'], regex:/Commander: Loading command",\[*([\w\-,"]*)\W*,"id:","([\w-]*)/},
-  {type:'commander',     label:'failure',           mapping: [{targets:(d) => { return d.replace(/"/,'').split(",")}},'commanderId'], regex:/Commander: Failed to load command",\[*([\w\-,"]*)\W*,"id:","([\w-]*)/},
+export const SessionBrokerPhases = {
+ requesting:       "sessionBroker_requesting",
+ connected:        "sessionBroker_connected",
+ alreadyConnected: "sessionBroker_alreadyConnected",
+ timeout:          "sessionBroker_timeout",
+ removedFromQueue: "sessionBroker_removedFromQueue",
+ failed:           "sessionBroker_failed",
+ revoke:           "sessionBroker_revoke",
+}
+export const SessionManagerPhases = {
+ sessionTimeout:   "sessionManager_sessionTimeout",
+}
 
-  {type:'command',       label:CommandPhases.created,    mapping: [{command: (d) => { d = d.replace(/\\/g,''); return JSON.parse(d); }}],  regex:/BleCommandManager: Loading command\W*({.*})"]/},
+let fromJSON = (d) => { d = d.replace(/\\/g,''); return JSON.parse(d); };
+
+  let sessionParsers = [
+  {type:'commander',     label:'created',           mapping: [{targets:(d) => { return d.replace(/"/,'').split(",")}},{commanderOptions: fromJSON}], regex:/Commander: Created for target",\[*([\w\-,"]*)\W*,"options:","({.*}*)"\]/},
+  {type:'commander',     label:'loadAction',        mapping: ['commandType','allowMeshRelays','commanderId'], regex:/Commander: Loading command\W*([\w-]*)\W*([\w]*),"id:","([\w-]*)/},
+  {type:'commander',     label:'failure',           mapping: ['errorMessage','commanderId'], regex:/Commander: Failed to load command\W*([\w]*)\W*id:\W*([\w-]*)/},
+
+  {type:'command',       label:CommandPhases.created,    mapping: [{command: fromJSON}],                                                   regex:/BleCommandManager: Loading command\W*({.*})"]/},
   {type:'command',       label:CommandPhases.performing, mapping: ['commandType', 'handle', 'commandId'],                                  regex:/BleCommandManager: Performing command\W*(\w*)\W*on\W*([\w-]*)\W*([\w-]*)/},
   {type:'command',       label:CommandPhases.succeeded,  mapping: ['commandType', 'handle', 'commandId'],                                  regex:/BleCommandManager: Succeeded command\W*(\w*)\W*on\W*([\w-]*)\W*([\w-]*)/},
   {type:'command',       label:CommandPhases.failed,     mapping: ['commandType', 'handle', 'error', 'commandId'],                         regex:/BleCommandManager: Something went wrong while performing\W*(\w*)\W*([\w-]*)\W*,([\w-]*)\W*([\w-]*)/},
-  {type:'command',       label:CommandPhases.duplicate,  mapping: ['removedCommandId', 'commandId', 'commandType','commandTargetType', 'commanderId'], regex:/BleCommandCleaner: Removed command due to duplicate\W*([\w-]*)\W*([\w-]*)\W*([\w-]*)\W*([\w-]*)\W*([\w-]*)/},
+  {type:'command',       label:CommandPhases.duplicate,  mapping: ['commandId', 'removedByCommandId', 'commandType','commandTargetType', 'commanderId'], regex:/BleCommandCleaner: Removed command due to duplicate\W*([\w-]*)\W*([\w-]*)\W*([\w-]*)\W*([\w-]*)\W*([\w-]*)/},
 
-  {type:'sessionBroker', label: 'requesting',       mapping: ["handle", "commanderId", "privateRequest", "commandType"], regex:/SessionBroker: actually requesting session\W*"([\w-]*)"\W*for\W*([\w-]*).*private\W*(\w*)\W*commandType\W*([\w-]*)/},
-  {type:'sessionBroker', label: 'connected',        mapping: ["handle", "commanderId"], regex:/SessionBroker: Session has connected to\W*([\w-]*)\W*for\W*([\w-]*)/,   },
-  {type:'sessionBroker', label: 'alreadyConnected', mapping: ["handle", "commanderId"], regex:/SessionBroker: Require session has thrown an ALREADY_REQUESTED_TIMEOUT error\W*([\w-]*)\W*,\W*([\w-]*)\W*/},
-  {type:'sessionBroker', label: 'timeout',          mapping: ["handle", "commanderId"], regex:/SessionBroker: Session failed to connect: SESSION_REQUEST_TIMEOUT\W*([\w-]*)\W*for\W*([\w-]*)/},
-  {type:'sessionBroker', label: 'removedFromQueue', mapping: ["handle", "commanderId"], regex:/SessionBroker: Session removed from queue\W*([\w-]*)\W*for\W*([\w-]*)/},
-  {type:'sessionBroker', label: 'failed',           mapping: ["handle", "commanderId"], regex:/SessionBroker: Failed to request session\W*([\w-]*)\W*for\W*([\w-]*)/},
-  {type:'sessionBroker', label: 'revoke',           mapping: ["handle", "commanderId"], regex:/SessionBroker: Revoke session\W*([\w-]*)\W*for\W*([\w-]*)/},
+  {type:'sessionBroker', label: SessionBrokerPhases.requesting,       mapping: ["handle", "commanderId", "privateRequest", "commandType"], regex:/SessionBroker: actually requesting session\W*"([\w-]*)"\W*for\W*([\w-]*).*private\W*(\w*)\W*commandType\W*([\w-]*)/},
+  {type:'sessionBroker', label: SessionBrokerPhases.connected,        mapping: ["handle", "commanderId"], regex:/SessionBroker: Session has connected to\W*([\w-]*)\W*for\W*([\w-]*)/,   },
+  {type:'sessionBroker', label: SessionBrokerPhases.alreadyConnected, mapping: ["handle", "commanderId"], regex:/SessionBroker: Require session has thrown an ALREADY_REQUESTED_TIMEOUT error\W*([\w-]*)\W*,\W*([\w-]*)\W*/},
+  {type:'sessionBroker', label: SessionBrokerPhases.timeout,          mapping: ["handle", "commanderId"], regex:/SessionBroker: Session failed to connect: SESSION_REQUEST_TIMEOUT\W*([\w-]*)\W*for\W*([\w-]*)/},
+  {type:'sessionBroker', label: SessionBrokerPhases.removedFromQueue, mapping: ["handle", "commanderId"], regex:/SessionBroker: Session removed from queue\W*([\w-]*)\W*for\W*([\w-]*)/},
+  {type:'sessionBroker', label: SessionBrokerPhases.failed,           mapping: ["handle", "commanderId"], regex:/SessionBroker: Failed to request session\W*([\w-]*)\W*for\W*([\w-]*)/},
+  {type:'sessionBroker', label: SessionBrokerPhases.revoke,           mapping: ["handle", "commanderId"], regex:/SessionBroker: Revoke session\W*([\w-]*)\W*for\W*([\w-]*)/},
+
+  {type:'sessionManager', label: SessionManagerPhases.sessionTimeout, mapping: ["handle", "commanderId"], regex:/SessionManager: SESSION_REQUEST_TIMEOUT Timeout called for\W*([\w-]*)\W*([\w-]*)/},
+
 
   {type:'session', label: SessionPhases.created,              mapping:['handle','sessionId'],    regex:/Session: Creating session\W*([\w-]*)\W*([\w-]*)/},
   {type:'session', label: SessionPhases.connecting,           mapping:['handle','sessionId'],    regex:/Session: Start connecting to\W*([\w-]*)\W*([\w-]*)/},
@@ -140,20 +158,29 @@ class CommanderCollector {
   commandId2CommandMap : CommandIdToCommandMap = {}
   commandData : CommandData = {};
 
+  _ensureCommanderEntry(item, commanderId) {
+    if (this.commanderData[commanderId] === undefined) {
+      this.commanderData[commanderId] = { tStart: item[0], tEnd: item[0], targets: {}, commands: {}, phases: [] };
+    }
+  }
+
   collect(item, parser, parseResult: any) {
-    if (parseResult.commanderId) {
-      if (this.commanderData[parseResult.commanderId] === undefined) {
-        this.commanderData[parseResult.commanderId] = { tStart: item[0], tEnd: item[0], targets: {}, commands: {}, phases: [] };
-      }
-      this.commanderData[parseResult.commanderId].phases.push({ time: item[0], label: parser.label, data:parseResult });
+    let commanderId = null;
+    if (parseResult.commanderOptions) {
+      commanderId = parseResult.commanderOptions.commanderId;
+    }
+    else if (parseResult.commanderId) {
+      commanderId = parseResult.commanderId;
     }
 
-     this.commanderData[parseResult.commanderId].tStart = Math.min( this.commanderData[parseResult.commanderId].tStart, item[0])
-     this.commanderData[parseResult.commanderId].tEnd   = Math.max( this.commanderData[parseResult.commanderId].tEnd, item[0])
+    this._ensureCommanderEntry(item, commanderId);
+    this.commanderData[commanderId].phases.push({ time: item[0], label: parser.label, data:parseResult });
+
+     this.commanderData[commanderId].tStart = Math.min( this.commanderData[commanderId].tStart, item[0])
+     this.commanderData[commanderId].tEnd   = Math.max( this.commanderData[commanderId].tEnd, item[0])
   }
 
   collectCommand(item, parser, parseResult) {
-    // console.log("command", parser.label, parseResult)
     let command = parseResult.command;
 
     let commanderId = null;
@@ -164,11 +191,8 @@ class CommanderCollector {
       commandId   = command.id;
       
       this.commandId2CommanderIdMap[commandId] = command.commanderId;
+      this._ensureCommanderEntry(item, commanderId);
 
-      if (this.commanderData[commanderId] === undefined) {
-        console.log("Missing commander", commanderId);
-        return;
-      }
       if (this.commanderData[commanderId].commands[commandId] === undefined) {
         this.commanderData[commanderId].commands[commandId] = {
           data: command,
@@ -192,9 +216,13 @@ class CommanderCollector {
       commandId   = parseResult.commandId;
       commanderId = this.commandId2CommanderIdMap[commandId];
       if (this.commanderData[commanderId] === undefined) {
+        console.log("Missing commander")
         return;
       }
-      this.commanderData[commanderId].phases.push({time:item[0], label: 'command_' + parser.label, commandId: commandId, data: parseResult});
+      if (parser.label === CommandPhases.duplicate) {
+        console.log("HERE", commanderId)
+      }
+      this.commanderData[commanderId].phases.push({time:item[0], label: parser.label, commandId: commandId, data: parseResult});
       this.commandData[parseResult.commandId].phases.push({time: item[0], label: parser.label});
     }
 
@@ -212,7 +240,18 @@ class CommanderCollector {
   collectSessionBroker(item, parser, parseResult) {
     let commanderId = parseResult.commanderId;
     if (commanderId) {
-      this.commanderData[commanderId].phases.push({time:item[0], label: 'sessionBroker_' + parser.label, data: parseResult});
+      this._ensureCommanderEntry(item, parseResult.commanderId);
+      this.commanderData[commanderId].phases.push({time:item[0], label: parser.label, data: parseResult});
+      this.commanderData[commanderId].tStart = Math.min( this.commanderData[commanderId].tStart, item[0])
+      this.commanderData[commanderId].tEnd   = Math.max( this.commanderData[commanderId].tEnd, item[0])
+    }
+  }
+
+  collectSessionManager(item, parser, parseResult) {
+    let commanderId = parseResult.commanderId;
+    if (commanderId) {
+      this._ensureCommanderEntry(item, parseResult.commanderId);
+      this.commanderData[commanderId].phases.push({time:item[0], label: parser.label, data: parseResult});
       this.commanderData[commanderId].tStart = Math.min( this.commanderData[commanderId].tStart, item[0])
       this.commanderData[commanderId].tEnd   = Math.max( this.commanderData[commanderId].tEnd, item[0])
     }
@@ -268,8 +307,10 @@ export class ConstellationParser extends BaseParser {
         this.commanderCollector.collect(item, parser, parseResult); break;
       case 'command':
         this.commanderCollector.collectCommand(item, parser, parseResult); break;
-      case 'sessioBroker':
+      case 'sessionBroker':
         this.commanderCollector.collectSessionBroker(item, parser, parseResult); break;
+      case 'sessionManager':
+        this.commanderCollector.collectSessionManager(item, parser, parseResult); break;
     }
 
     return true;

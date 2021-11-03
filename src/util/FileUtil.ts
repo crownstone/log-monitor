@@ -72,6 +72,22 @@ export const FileUtil = {
     return file;
   },
 
+  getProcessedData(user, date) {
+    let filePath = path.join(USER_PATH, user, 'processed', `CrownstoneAppLog${date}.log`);
+    if (FileUtil.fileExists(filePath)) {
+      return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    }
+    return null;
+  },
+
+  storeProcessedData(user, date, data) {
+    let filePath = path.join(USER_PATH, user, 'processed', `CrownstoneAppLog${date}.log`);
+    FileUtil.ensurePath(path.join(USER_PATH, user, 'processed'));
+    let stringBuffer = JSON.stringify(data,null,2);
+    console.log('stringBuffer.length',stringBuffer.length)
+    fs.writeFileSync(filePath, stringBuffer);
+  },
+
   getDirectoryPaths: function(inPath) : string[] {
     let items = FileUtil.getDirectories(inPath);
     let result : string[] = [];

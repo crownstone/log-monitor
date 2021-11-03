@@ -1,127 +1,53 @@
 import React from "react";
-import {SessionPhases} from "../parsers/app/parsers/ConstellationParser";
-import * as vis from "vis-timeline/standalone/umd/vis-timeline-graph2d";
-import {SessionPhaseTimeline} from "./SessionPhaseTimeline";
 import {Backdrop, Paper} from "@mui/material";
-import {getGroupName} from "../parsers/util";
+import {SessionPhaseTimeline} from "./SessionPhaseTimeline";
+import {EventBusClass} from "../util/EventBus";
+import {SessionDataFlowManager} from "../logic/DataFlowManager_sessions";
+import {DataFlowTimeline} from "./DataFlowTimeline";
 
-export class SessionTimeline extends React.Component<{ data: ParseDataResult }, { overlayContent: any | null }> {
+export class SessionTimeline extends React.Component<{ data: ParseDataResult, eventBus: EventBusClass }, { overlayContent: any | null }> {
 
-  timeline;
-
-  itemsDataset = null;
-  groupsDataset = null;
+  dataFlowTimeline: DataFlowTimeline;
+  dataFlowManager: SessionDataFlowManager;
 
   constructor(params) {
     super(params);
     this.state = {overlayContent: null};
-    // console.log(this.props.data)
+    this.dataFlowManager = new SessionDataFlowManager();
+    this.dataFlowTimeline = new DataFlowTimeline(this.dataFlowManager, this.props.eventBus);
   }
 
   componentDidMount() {
     const { viscontainer } = this.refs;
-    console.time("PreparingData")
-    // console.log(this.props.data)
 
-    let items = [];
-    let session;
-    let total = 0;
-    let constellation = this.props.data.constellation;
-    let reboots = this.props.data.reboots;
-    let nameMap = this.props.data.nameMap;
-    let groups = {};
-
-    let viewMap = {
-      unconnected:      false,
-      connecting:       true,
-      connectingFailed: true,
-      connected:        true,
-      commandExecuted:  true,
-      ERROR:            true,
-    }
-
-    let lastT = 0
-    let connectCount = 0;
-    let connectingCount = 0;
-
-    for (let sessionId in constellation.sessions) {
-      session = constellation.sessions[sessionId];
-      let className = 'unconnected';
-      if (session.properties[SessionPhases.connecting]) {
-        className = 'connecting';
-        connectingCount++;
-      }
-      if (session.properties[SessionPhases.connectingFailed]) {
-        if (session.properties[SessionPhases.connectingFailed].error !== "CONNECTION_CANCELLED") {
-          className = 'connectingFailed';
-        }
-      }
-      if (session.properties[SessionPhases.connected]) {
-        className = 'connected';
-        connectCount++;
-      }
-      if (session.properties[SessionPhases.performCommand]) {
-        className = 'commandExecuted';
-      }
-      if (!session.properties[SessionPhases.ended]) {
-        className = 'ERROR';
-      }
-
-      let groupName = getGroupName(nameMap, session.handle);
-
-      groups[groupName] = {id: groupName, content: groupName};
-      if (viewMap[className] === false) {
-        continue;
-      }
-
-
-      items.push({id: sessionId, start: session.tStart, end: session.tEnd, group: groupName, className: className});
-      total++;
-
-      if (total > 10000) {
-        lastT = Math.max(session.tEnd, lastT);
-        console.log("Stopped prematurely.", new Date(lastT));
-        break;
-      }
-    }
-
+    console.time("PreparingData");
+    this.dataFlowManager.load(this.props.data);
     console.timeEnd("PreparingData");
-    console.time("Loading");
 
-    // Create a DataSet (allows two way data-binding)
-    this.itemsDataset = new vis.DataSet(items);
-    this.groupsDataset = new vis.DataSet(Object.values(groups));
+    console.time("GettingData");
+    this.dataFlowManager.getAll();
+    console.timeEnd("GettingData");
 
     // Configuration for the Timeline
     var options = {
       stack: false
     };
 
-    console.timeEnd("Loading")
-    // Create a Timeline
-    console.time("Initializing")
-    this.timeline = new vis.Timeline(viscontainer as HTMLElement, this.itemsDataset, this.groupsDataset, options);
-    console.timeEnd("Initializing")
-    if (lastT > 0) {
-      let markerId = 'ABORT_MARKER';
-      this.timeline.addCustomTime(new Date(lastT),markerId, false);
-      this.timeline.setCustomTimeMarker("Stopped drawing new items.",markerId, false);
-    }
-    for (let reboot of reboots) {
-      let markerId = 'reboot' + reboot[1];
-      this.timeline.addCustomTime(new Date(reboot[0]), markerId, false);
-      this.timeline.setCustomTimeMarker("Reboot",markerId, false);
-    }
-    this.timeline.on('select', (properties) => {
+    this.dataFlowTimeline.create(viscontainer, options)
+    this.dataFlowTimeline.on('select', (properties) => {
       if (properties.items) {
-        if (constellation.sessions[properties.items]?.phases) {
-          this.setState({overlayContent: <SessionPhaseTimeline sessionId={properties.items} data={constellation}/>});
+        if (this.props.data.constellation.sessions[properties.items]?.phases) {
+          this.setState({overlayContent: <SessionPhaseTimeline sessionId={properties.items} data={this.props.data.constellation}/>});
         }
       }
     });
-    console.log("Connecting Count", connectingCount)
-    console.log("Connected Count", connectCount)
   }
+
+  componentWillUnmount() {
+    this.dataFlowManager.destroy();
+    this.dataFlowTimeline.destroy();
+  }
+
 
   render() {
     return (

@@ -58,9 +58,10 @@ export class SessionPhaseTimeline extends React.Component<{ data: ConstellationP
     this.groupsDataset = new vis.DataSet();
 
     // Configuration for the Timeline
-    var options : TimelineOptions = {
-      start: startT - 1000,
-      end: endT + 1000,
+    let range = endT - startT;
+    let options : TimelineOptions = {
+      start: startT - 0.1*range,
+      end: endT + 0.1*range,
       cluster: {
         maxItems: 10
       },
@@ -84,7 +85,7 @@ export class SessionPhaseTimeline extends React.Component<{ data: ConstellationP
 
     return (
       <div style={{position:'relative', width:'100%', minHeight: 800}}>
-        <h3>{session.handle}</h3>
+        <h3>{session.handle}:{this.props.sessionId}</h3>
         <div ref={'viscontainer'} />
       </div>
     );

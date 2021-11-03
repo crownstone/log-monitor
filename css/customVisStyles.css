@@ -20,7 +20,13 @@
 }
 .vis-item.connecting {
     background-color: #5deaff;
-    border-width:0px
+    border-width:1px;
+    border-color: #53d2e6;
+}
+.vis-item.performingCommand {
+    background-color: #5deaff;
+    border-width:1px;
+    border-color: #53d2e6;
 }
 .vis-item.connectingFailed {
     background-color: #eea23b;
@@ -37,3 +43,17 @@
     border-width:1px;
     border-color: #4f0000;
 }
+
+.vis-item.TIMEOUT {
+    background-color: #f16161;
+    border-width:1px;
+    border-color: #bf4c4c;
+}
+
+
+
+.vis-panel.vis-left.vis-inner {
+    width: 300px;
+}
+
+
