@@ -1,10 +1,10 @@
 import {SessionPhases} from "../parsers/app/ConstellationParser";
 import {getGroupName} from "../parsers/util";
-import {DataFlowManagerBase} from "./DataFlowManagerBase";
+import {DataFlowManagerEvents} from "./DataFlowManager_events";
 
 type SessionType = "unconnected" | "connecting" | "connectingFailed" | "connected" | "commandExecuted" | "ERROR"
 
-export class SessionDataFlowManager extends DataFlowManagerBase {
+export class SessionDataFlowManager extends DataFlowManagerEvents {
 
   itemThreshold = 2000;
   priority = [
@@ -62,15 +62,8 @@ export class SessionDataFlowManager extends DataFlowManagerBase {
       this.endTime = Math.max(this.endTime, session.tEnd);
     }
 
-    this.eventDataGroups['reboots'] = [];
-    for (let reboot of reboots) {
-      let markerId = 'reboot' + reboot[1];
-      this.eventDataGroups['reboots'].push({id: markerId, time: reboot[0], content: 'Reboot'})
-    }
-
-
-    this.eventDataGroups['startTime'] = data.startTime;
-    this.eventDataGroups['endTime']   = data.endTime;
+    this.loadReboots(data);
+    this.loadStartEndTimes(data);
 
     this.groupDataSet.add(Object.values(groups));
   }

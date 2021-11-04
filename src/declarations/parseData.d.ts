@@ -27,7 +27,7 @@ interface NameMap {
 
 interface ConstellationParseResult {
   sessions:   SessionData,
-  commanders: CommanderData,
+  commanders: CommanderDataMap,
   commands:   CommandData,
   maps: {
     commandId2commandMap: CommandIdToCommandMap,
@@ -58,16 +58,18 @@ interface CommanderPhase extends Phase {
   commandId?: string
 }
 
+interface CommanderDataMap {
+  [commanderId: string] : CommanderData
+}
+
 interface CommanderData {
-  [commanderId: string] : {
-    data: commandOptions,
-    tStart: number,
-    tEnd: number,
-    commands: {[commandId: string]: boolean },
-    targets: any,
-    phases: CommanderPhase[],
-    properties:Properties
-  }
+  data: commandOptions,
+  tStart: number,
+  tEnd: number,
+  commands: {[commandId: string]: boolean },
+  targets: any,
+  phases: CommanderPhase[],
+  properties:Properties
 }
 
 interface CommandData {

@@ -1,42 +1,49 @@
-import {DataFlowManagerBase} from "./DataFlowManagerBase";
 import {CommandPhases, SessionBrokerPhases, SessionManagerPhases} from "../parsers/app/ConstellationParser";
+import {DataFlowManagerEvents} from "./DataFlowManager_events";
 
-export class CommanderDataFlowManager extends DataFlowManagerBase {
+export class CommanderDataFlowManager extends DataFlowManagerEvents {
 
   itemThreshold = 2000;
   priority = [
-    "commanders",
+    "public",
+    "private",
     "broadcasters",
   ]
+
+  commanderType = null;
+  constructor(commanderType: string) {
+    super();
+    this.commanderType = commanderType;
+  }
+
+  getCommanderType(commander: CommanderData) {
+    let commanderType = "public";
+    if (commander.data.private) {
+      commanderType = 'private'
+    }
+    else if (commander.targets.length > 0 && commander.targets[0] === "BROADCAST") {
+      commanderType = 'broadcasters'
+    }
+    else if (commander.properties[CommandPhases.loadingBroadcast]) {
+      commanderType = 'broadcasters';
+    }
+    return commanderType;
+  }
 
   load(data: ParseDataResult) {
     let commander;
     let groups = {};
     let constellation = data.constellation;
-    let reboots = data.reboots;
-    let localization = data.localization;
 
-    groups['commanders']   = {id: 'commanders',   content:'commanders',   subgroupStack: false, style:'width: 300px'};
-    groups['broadcasters'] = {id: 'broadcasters', content:'broadcasters', subgroupStack: true,  style:'width: 300px', cluster:false};
-    groups['private']      = {id: 'private',      content:'private',      subgroupStack: true,  style:'width: 300px', cluster:false};
+    groups[this.commanderType] = {id: this.commanderType, content:this.commanderType, style:'width: 300px'};
+
 
     for (let commanderId in constellation.commanders) {
-      let className = 'unconnected';
+      let className = 'connectingFailed';
       commander = constellation.commanders[commanderId];
-      let commanderType = "commanders";
-
-      if (commander.data.private) {
-        commanderType = 'private'
-      }
-      else if (commander.targets.length > 0 && commander.targets[0] === "BROADCAST") {
-        commanderType = 'broadcasters'
-      }
-      else if (commander.properties[CommandPhases.loadingBroadcast]) {
-        commanderType = 'broadcasters';
-      }
-
-      if (!this.rangeDataGroups[commanderType]) {
-        this.rangeDataGroups[commanderType] = [];
+      let commanderType = this.getCommanderType(commander);
+      if (this.commanderType !== commanderType) {
+        continue;
       }
 
       if (commander.properties[SessionManagerPhases.sessionTimeout]) {
@@ -52,13 +59,16 @@ export class CommanderDataFlowManager extends DataFlowManagerBase {
         className = 'performedCommandFailed'
       }
 
+      if (!this.rangeDataGroups[this.commanderType]) {
+        this.rangeDataGroups[this.commanderType] = [];
+      }
 
-      this.rangeDataGroups[commanderType].push({
+      this.rangeDataGroups[this.commanderType].push({
         id:      commanderId,
         start:   commander.tStart,
         end:     commander.tEnd,
         content: commander.phases[1].data.commandType,
-        group:   commanderType,
+        group:   this.commanderType,
         className
       });
 
@@ -66,24 +76,9 @@ export class CommanderDataFlowManager extends DataFlowManagerBase {
       this.endTime   = Math.max(this.endTime,   commander.tEnd);
     }
 
-    this.eventDataGroups['reboots'] = [];
-    for (let reboot of reboots) {
-      let markerId = 'reboot' + reboot[1];
-      this.eventDataGroups['reboots'].push({id: markerId, time: reboot[0], content: 'Reboot'})
-    }
-
-    this.eventDataGroups['localization'] = [];
-    let localizationCount = 0;
-    for (let localizationData of localization.locations) {
-      let markerId = 'localization' + localizationCount++;
-      let locationName = data.nameMap?.locationIdMap?.[localizationData.data.locationId]?.name || localizationData.data.locationId;
-      this.eventDataGroups['localization'].push({id: markerId, time: localizationData.time, content: locationName})
-    }
-    for (let localizationData of localization.spheres) {
-      let markerId = 'sphere' + localizationCount++;
-      let sphereName = data.nameMap?.sphereIdMap?.[localizationData.data.sphereId]?.name || localizationData.data.sphereId;
-      this.eventDataGroups['localization'].push({id: markerId, time: localizationData.time, content: localizationData.label + "<br/>" + sphereName})
-    }
+    this.loadReboots(data)
+    this.loadLocalization(data)
+    this.loadStartEndTimes(data);
 
 
     this.groupDataSet.add(Object.values(groups));
