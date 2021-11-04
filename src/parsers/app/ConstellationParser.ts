@@ -48,22 +48,22 @@ import {BaseParser} from "./BaseParser";
  */
 
 export const SessionPhases = {
- created:              'session_created',
- connecting:           'session_connecting',
- connected:            'session_connected',
- connectingFailed:     'session_connectingFailed',
- retryConnection:      'session_retryConnection',
- performCommand:       'session_performCommand',
- performedCommand:     'session_performedCommand',
- interrupted:          'session_interrupted',
- killRequest:          'session_killRequest',
- killCompleted:        'session_killCompleted',
- ended:                'session_ended',
- disconnectingCommand: 'session_disconnectingCommand',
- disconnectingPhone:   'session_disconnectingPhone',
+ created:               'session_created',
+ connecting:            'session_connecting',
+ connected:             'session_connected',
+ connectingFailed:      'session_connectingFailed',
+ retryConnection:       'session_retryConnection',
+ performCommand:        'session_performCommand',
+ performedCommand:      'session_performedCommand',
+ interrupted:           'session_interrupted',
+ killRequest:           'session_killRequest',
+ killCompleted:         'session_killCompleted',
+ ended:                 'session_ended',
+ disconnectingCommand:  'session_disconnectingCommand',
+ disconnectingPhone:    'session_disconnectingPhone',
  disconnectPromiseDone: 'session_disconnectPromiseDone',
- disconnectedRetry:    'session_disconnectedRetry',
- disconnected:         'session_disconnected',
+ disconnectedRetry:     'session_disconnectedRetry',
+ disconnected:          'session_disconnected',
 }
 export const CommandPhases = {
   created    : 'command_created',
@@ -71,6 +71,12 @@ export const CommandPhases = {
   succeeded  : 'command_succeeded',
   failed     : 'command_failed',
   duplicate  : 'command_duplicate',
+  loadingBroadcast    : 'command_loading_broadcast',
+  broadcastDelayed    : 'command_delayed_broadcast',
+  broadcastDuplicate  : 'command_cancelled_broadcast_duplicate',
+  broadcastStart      : 'command_broadcast_started',
+  broadcastSuccess    : 'command_broadcast_success',
+  broadcastError      : 'command_broadcast_error',
 }
 
 export const SessionBrokerPhases = {
@@ -81,6 +87,7 @@ export const SessionBrokerPhases = {
  removedFromQueue: "sessionBroker_removedFromQueue",
  failed:           "sessionBroker_failed",
  revoke:           "sessionBroker_revoke",
+ success:          "sessionBroker_success",
 }
 export const SessionManagerPhases = {
  sessionTimeout:   "sessionManager_sessionTimeout",
@@ -89,15 +96,21 @@ export const SessionManagerPhases = {
 let fromJSON = (d) => { d = d.replace(/\\/g,''); return JSON.parse(d); };
 
   let sessionParsers = [
-  {type:'commander',     label:'created',           mapping: [{targets:(d) => { return d.replace(/"/,'').split(",")}},{commanderOptions: fromJSON}], regex:/Commander: Created for target",\[*([\w\-,"]*)\W*,"options:","({.*}*)"\]/},
+  {type:'commander',     label:'created',           mapping: [{targets:(d) => { return d.replace(/"/,'').split(",")}},{commanderOptions: fromJSON}], regex:/Commander: Created for target",\[*([\w\-,"]*)\W*,"options:","({.*}*)"/},
   {type:'commander',     label:'loadAction',        mapping: ['commandType','allowMeshRelays','commanderId'], regex:/Commander: Loading command\W*([\w-]*)\W*([\w]*),"id:","([\w-]*)/},
   {type:'commander',     label:'failure',           mapping: ['errorMessage','commanderId'], regex:/Commander: Failed to load command\W*([\w]*)\W*id:\W*([\w-]*)/},
 
   {type:'command',       label:CommandPhases.created,    mapping: [{command: fromJSON}],                                                   regex:/BleCommandManager: Loading command\W*({.*})"]/},
   {type:'command',       label:CommandPhases.performing, mapping: ['commandType', 'handle', 'commandId'],                                  regex:/BleCommandManager: Performing command\W*(\w*)\W*on\W*([\w-]*)\W*([\w-]*)/},
   {type:'command',       label:CommandPhases.succeeded,  mapping: ['commandType', 'handle', 'commandId'],                                  regex:/BleCommandManager: Succeeded command\W*(\w*)\W*on\W*([\w-]*)\W*([\w-]*)/},
-  {type:'command',       label:CommandPhases.failed,     mapping: ['commandType', 'handle', 'error', 'commandId'],                         regex:/BleCommandManager: Something went wrong while performing\W*(\w*)\W*([\w-]*)\W*,([\w-]*)\W*([\w-]*)/},
+  {type:'command',       label:CommandPhases.failed,     mapping: ['commandType', 'handle', 'error', 'commandId'],                         regex:/BleCommandManager: Something went wrong while performing\W*(\w*)\W*([\w-]*)\W*(.*)",\W*([\w-]*)/},
   {type:'command',       label:CommandPhases.duplicate,  mapping: ['commandId', 'removedByCommandId', 'commandType','commandTargetType', 'commanderId'], regex:/BleCommandCleaner: Removed command due to duplicate\W*([\w-]*)\W*([\w-]*)\W*([\w-]*)\W*([\w-]*)\W*([\w-]*)/},
+  {type:'command',       label:CommandPhases.loadingBroadcast,    mapping: [{command: fromJSON}], regex:/BroadcastCommandManager: Loading command for broadcast\W*({.*})"]/},
+  {type:'command',       label:CommandPhases.broadcastDelayed,    mapping: ['commandType','commandId'], regex:/BroadcastCommandManager: Scheduling broadcast for later\W*([\w]*)\W*([\w-]*)/},
+  {type:'command',       label:CommandPhases.broadcastDuplicate,  mapping: ['commandType','commandId'], regex:/BroadcastCommandManager: Remove item from duplicate queue[\W\d]*(\w*)\W*([\w-]*)/},
+  {type:'command',       label:CommandPhases.broadcastStart,      mapping: ['commandType','commandId'], regex:/BroadcastCommandManager: broadcasting\W*(\w*)\W*([\w-]*)/},
+  {type:'command',       label:CommandPhases.broadcastSuccess,    mapping: ['commandType','commandId'], regex:/BroadcastCommandManager: Successfully broadcast\W*(\w*)\W*([\w-]*)/},
+  {type:'command',       label:CommandPhases.broadcastError,      mapping: ['commandType','commandId','error'], regex:/BroadcastCommandManager: Error broadcasting\W*(\w*)\W*([\w-]*)[\W]*([\w]*)"\]/},
 
   {type:'sessionBroker', label: SessionBrokerPhases.requesting,       mapping: ["handle", "commanderId", "privateRequest", "commandType"], regex:/SessionBroker: actually requesting session\W*"([\w-]*)"\W*for\W*([\w-]*).*private\W*(\w*)\W*commandType\W*([\w-]*)/},
   {type:'sessionBroker', label: SessionBrokerPhases.connected,        mapping: ["handle", "commanderId"], regex:/SessionBroker: Session has connected to\W*([\w-]*)\W*for\W*([\w-]*)/,   },
@@ -106,6 +119,7 @@ let fromJSON = (d) => { d = d.replace(/\\/g,''); return JSON.parse(d); };
   {type:'sessionBroker', label: SessionBrokerPhases.removedFromQueue, mapping: ["handle", "commanderId"], regex:/SessionBroker: Session removed from queue\W*([\w-]*)\W*for\W*([\w-]*)/},
   {type:'sessionBroker', label: SessionBrokerPhases.failed,           mapping: ["handle", "commanderId"], regex:/SessionBroker: Failed to request session\W*([\w-]*)\W*for\W*([\w-]*)/},
   {type:'sessionBroker', label: SessionBrokerPhases.revoke,           mapping: ["handle", "commanderId"], regex:/SessionBroker: Revoke session\W*([\w-]*)\W*for\W*([\w-]*)/},
+  {type:'sessionBroker', label: SessionBrokerPhases.success,          mapping: ["commandId", "commanderId"], regex:/SessionBroker: Command finished.\W*([\w-]*)\W*([\w-]*)\W/},
 
   {type:'sessionManager', label: SessionManagerPhases.sessionTimeout, mapping: ["handle", "commanderId"], regex:/SessionManager: SESSION_REQUEST_TIMEOUT Timeout called for\W*([\w-]*)\W*([\w-]*)/},
 
@@ -160,7 +174,7 @@ class CommanderCollector {
 
   _ensureCommanderEntry(item, commanderId) {
     if (this.commanderData[commanderId] === undefined) {
-      this.commanderData[commanderId] = { tStart: item[0], tEnd: item[0], targets: {}, commands: {}, phases: [] };
+      this.commanderData[commanderId] = { data: null, tStart: item[0], tEnd: item[0], targets: {}, commands: {}, phases: [], properties:{}};
     }
   }
 
@@ -174,10 +188,19 @@ class CommanderCollector {
     }
 
     this._ensureCommanderEntry(item, commanderId);
+    if (parseResult.commanderOptions) {
+      this.commanderData[commanderId].data = parseResult.commanderOptions;
+    }
+
+    if (parseResult.targets) {
+      this.commanderData[commanderId].targets = parseResult.targets;
+    }
+
     this.commanderData[commanderId].phases.push({ time: item[0], label: parser.label, data:parseResult });
 
-     this.commanderData[commanderId].tStart = Math.min( this.commanderData[commanderId].tStart, item[0])
-     this.commanderData[commanderId].tEnd   = Math.max( this.commanderData[commanderId].tEnd, item[0])
+    this.commanderData[commanderId].tStart = Math.min( this.commanderData[commanderId].tStart, item[0])
+    this.commanderData[commanderId].tEnd   = Math.max( this.commanderData[commanderId].tEnd, item[0])
+    this.commanderData[commanderId].properties[parser.label] = parseResult;
   }
 
   collectCommand(item, parser, parseResult) {
@@ -194,11 +217,7 @@ class CommanderCollector {
       this._ensureCommanderEntry(item, commanderId);
 
       if (this.commanderData[commanderId].commands[commandId] === undefined) {
-        this.commanderData[commanderId].commands[commandId] = {
-          data: command,
-          phases: [{time: item[0], label: parser.label}],
-          properties: {[parser.label]: parseResult}
-        };
+        this.commanderData[commanderId].commands[commandId] = true
       }
 
       if (this.commandData[commandId] === undefined) {
@@ -209,30 +228,30 @@ class CommanderCollector {
         this.handleMap[command.commandTarget] = [];
       }
       this.handleMap[command.commandTarget].push({time: item[0], commandId: commandId})
-      this.commandId2CommandMap[commandId] = this.commanderData[commanderId].commands[commandId];
+      this.commandId2CommandMap[commandId] = this.commandData[commandId];
     }
 
     if (parseResult.commandId) {
       commandId   = parseResult.commandId;
       commanderId = this.commandId2CommanderIdMap[commandId];
       if (this.commanderData[commanderId] === undefined) {
+        console.log(parser, parseResult)
         console.log("Missing commander")
         return;
       }
-      if (parser.label === CommandPhases.duplicate) {
-        console.log("HERE", commanderId)
-      }
       this.commanderData[commanderId].phases.push({time:item[0], label: parser.label, commandId: commandId, data: parseResult});
-      this.commandData[parseResult.commandId].phases.push({time: item[0], label: parser.label});
+
+    }
+
+    if (commandId) {
+      this.commandData[commandId].properties[parser.label] = parseResult;
+      this.commandData[commandId].phases.push({time: item[0], label: parser.label, data: parseResult});
     }
 
     if (commanderId) {
       this.commanderData[commanderId].tStart = Math.min( this.commanderData[commanderId].tStart, item[0]);
       this.commanderData[commanderId].tEnd   = Math.max( this.commanderData[commanderId].tEnd, item[0]);
-      if (commandId) {
-        this.commanderData[commanderId].commands[commandId].properties[parser.label] = parseResult;
-        this.commanderData[commanderId].commands[commandId].phases.push({time:item[0], label: parser.label, data: parseResult});
-      }
+      this.commanderData[commanderId].properties[parser.label] = parseResult;
     }
   }
 
@@ -241,6 +260,7 @@ class CommanderCollector {
     let commanderId = parseResult.commanderId;
     if (commanderId) {
       this._ensureCommanderEntry(item, parseResult.commanderId);
+      this.commanderData[commanderId].properties[parser.label] = parseResult;
       this.commanderData[commanderId].phases.push({time:item[0], label: parser.label, data: parseResult});
       this.commanderData[commanderId].tStart = Math.min( this.commanderData[commanderId].tStart, item[0])
       this.commanderData[commanderId].tEnd   = Math.max( this.commanderData[commanderId].tEnd, item[0])
@@ -251,6 +271,7 @@ class CommanderCollector {
     let commanderId = parseResult.commanderId;
     if (commanderId) {
       this._ensureCommanderEntry(item, parseResult.commanderId);
+      this.commanderData[commanderId].properties[parser.label] = parseResult;
       this.commanderData[commanderId].phases.push({time:item[0], label: parser.label, data: parseResult});
       this.commanderData[commanderId].tStart = Math.min( this.commanderData[commanderId].tStart, item[0])
       this.commanderData[commanderId].tEnd   = Math.max( this.commanderData[commanderId].tEnd, item[0])

@@ -2,7 +2,7 @@ import React from "react";
 import * as vis from "vis-timeline/standalone/umd/vis-timeline-graph2d";
 import {TimelineOptions} from "vis-timeline/types";
 import {getGroupName} from "../parsers/util";
-import {CommandPhases, SessionBrokerPhases, SessionManagerPhases} from "../parsers/app/parsers/ConstellationParser";
+import {CommandPhases, SessionBrokerPhases, SessionManagerPhases} from "../parsers/app/ConstellationParser";
 
 const COMMANDER_GROUP = "Commander";
 
@@ -46,11 +46,16 @@ export class CommanderPhaseTimeline extends React.Component<{ data: ParseDataRes
         sessionBrokerItems[handle].startT = Math.min(phase.time, sessionBrokerItems[handle].startT);
         sessionBrokerItems[handle].endT   = Math.max(phase.time, sessionBrokerItems[handle].endT);
         sessionBrokerItems[handle].phases.push({start: phase.time, content: phase.label});
-        sessionBrokerItems[handle].properties[phase.label] = phase.time;
+        sessionBrokerItems[handle].properties[phase.label] = phase;
       }
       else {
         if (phase.data.commandType) {
-          items.push({start: phase.time, content: phase.label + "\n" + phase.data.commandType, group: COMMANDER_GROUP});
+          items.push({start: phase.time, content: phase.label + "<br/>" + phase.data.commandType, group: COMMANDER_GROUP});
+        }
+        else if (phase.data.commandId) {
+          let command = constellation.commands[phase.data.commandId];
+          let commandType = command.data.command.type;
+          items.push({start: phase.time, content: phase.label + "<br/>" + commandType, group: COMMANDER_GROUP});
         }
         else {
           items.push({start: phase.time, content: phase.label, group: COMMANDER_GROUP});
@@ -73,7 +78,7 @@ export class CommanderPhaseTimeline extends React.Component<{ data: ParseDataRes
       }
       if (handleData.properties[SessionBrokerPhases.revoke]) {
         commanderSingularEvents["SESSION_REVOKE"] = {
-          start: handleData.properties[SessionBrokerPhases.revoke],
+          start: handleData.properties[SessionBrokerPhases.revoke].time,
           group: COMMANDER_GROUP,
           className: className,
           content:"SESSION_REVOKE"
@@ -94,7 +99,7 @@ export class CommanderPhaseTimeline extends React.Component<{ data: ParseDataRes
       if (handleData.properties[SessionManagerPhases.sessionTimeout]) {
         className = "TIMEOUT";
         commanderSingularEvents["SESSION_TIMEOUT"] = {
-          start: handleData.properties[SessionManagerPhases.sessionTimeout],
+          start: handleData.properties[SessionManagerPhases.sessionTimeout].time,
           group: COMMANDER_GROUP,
           className: className,
           content:"SESSION_TIMEOUT"
@@ -108,7 +113,6 @@ export class CommanderPhaseTimeline extends React.Component<{ data: ParseDataRes
       items.push(commanderSingularEvents[event]);
     }
 
-    console.log(items)
     // Create a DataSet (allows two way data-binding)
     this.itemsDataset = new vis.DataSet(items);
     this.groupsDataset = new vis.DataSet(Object.values(groups));

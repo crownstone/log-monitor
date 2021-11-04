@@ -34,9 +34,33 @@ export class DataFlowTimeline {
     this._updateDynamicItems()
 
     // draw reboot markers
-    for (let reboot of this.dataFlowManager.eventDataGroups['reboots']) {
-      this.timeline.addCustomTime(new Date(reboot.time), reboot.id, false);
-      this.timeline.setCustomTimeMarker(reboot.content, reboot.id, false);
+    if (this.dataFlowManager.eventDataGroups['reboots']) {
+      for (let reboot of this.dataFlowManager.eventDataGroups['reboots']) {
+        this.timeline.addCustomTime(new Date(reboot.time), reboot.id, false);
+        this.timeline.setCustomTimeMarker(reboot.content, reboot.id, false);
+      }
+    }
+
+    // draw localization markers
+    // if (this.dataFlowManager.eventDataGroups['localization']) {
+    //   for (let localizationMarker of this.dataFlowManager.eventDataGroups['localization']) {
+    //     this.timeline.addCustomTime(new Date(localizationMarker.time), localizationMarker.id, false);
+    //     this.timeline.setCustomTimeMarker(localizationMarker.content, localizationMarker.id, false);
+    //   }
+    // }
+
+
+    // draw localization markers
+    if (this.dataFlowManager.eventDataGroups['startTime']) {
+      this.timeline.addCustomTime(this.dataFlowManager.eventDataGroups['startTime'], 'startTime', false);
+      this.timeline.setCustomTimeMarker('START', 'startTime', false);
+    }
+
+
+    // draw localization markers
+    if (this.dataFlowManager.eventDataGroups['endTime']) {
+      this.timeline.addCustomTime(this.dataFlowManager.eventDataGroups['endTime'], 'endTime', false);
+      this.timeline.setCustomTimeMarker('END OF LOGS', 'endTime', false);
     }
   }
 

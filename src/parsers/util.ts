@@ -42,10 +42,11 @@ export function preProcessConsumerApp(data: string) {
 }
 
 
-export function getGroupName(nameMap : {[handle: string]: StoneMap}, handle : string) : string {
-  let map = nameMap[handle.toLowerCase()];
-  if (map === undefined) { return handle; }
+export function getGroupName(nameMap : NameMap, handle : string) : string {
+  let id = nameMap.stoneHandleMap[handle.toLowerCase()];
+  let stoneMap = nameMap.stoneIdMap[id];
+  if (stoneMap === undefined) { return handle; }
+  let locationName = nameMap.locationIdMap[stoneMap.locationId]?.name
 
-
-  return `${map.cid}: ${map.name} in ${map.locationName}`;
+  return `${stoneMap.uid}: ${stoneMap.name} in ${locationName}`;
 }

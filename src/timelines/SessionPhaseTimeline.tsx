@@ -1,7 +1,7 @@
 import React from "react";
 import * as vis from "vis-timeline/standalone/umd/vis-timeline-graph2d";
 import {TimelineOptions} from "vis-timeline/types";
-import {CommandPhases, SessionPhases} from "../parsers/app/parsers/ConstellationParser";
+import {CommandPhases} from "../parsers/app/ConstellationParser";
 
 
 export class SessionPhaseTimeline extends React.Component<{ data: ConstellationParseResult, sessionId }, any> {

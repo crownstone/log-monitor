@@ -1,4 +1,4 @@
-import {SessionPhases} from "../parsers/app/parsers/ConstellationParser";
+import {SessionPhases} from "../parsers/app/ConstellationParser";
 import {getGroupName} from "../parsers/util";
 import {DataFlowManagerBase} from "./DataFlowManagerBase";
 
@@ -68,6 +68,9 @@ export class SessionDataFlowManager extends DataFlowManagerBase {
       this.eventDataGroups['reboots'].push({id: markerId, time: reboot[0], content: 'Reboot'})
     }
 
+
+    this.eventDataGroups['startTime'] = data.startTime;
+    this.eventDataGroups['endTime']   = data.endTime;
 
     this.groupDataSet.add(Object.values(groups));
   }

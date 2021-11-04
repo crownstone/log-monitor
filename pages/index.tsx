@@ -8,7 +8,7 @@ import {EventBusClass} from "../src/util/EventBus";
 export const getStaticProps: GetStaticProps = async (context) => {
   console.time("Parsing")
   let result = {};
-  await parseConsumerAppFileByLine('Alex','2021-11-02', result)
+  await parseConsumerAppFileByLine('Alex','2021-11-04', result);
   console.timeEnd("Parsing")
   return {
     props: {title:"Constellation", data: result},

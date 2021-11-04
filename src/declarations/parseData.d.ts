@@ -2,14 +2,27 @@
 type RebootData = [number, number];
 
 interface ParseDataResult {
-  reboots: RebootData[],
+  reboots:       RebootData[],
   constellation: ConstellationParseResult,
-  nameMap: NameMap,
+  nameMap:       NameMap,
+  localization:  LocalizationParseResult,
+
+  startTime: number,
+  endTime:   number,
 }
 
+interface LocalizationParseResult {
+  spheres:   {time: number, label: string, data: {sphereId: string}}[],
+  locations: {time: number, label: string, data: {locationId: string, sphereId: string}}[],
+}
 
+type stoneAppId = string;
+type locationAppId = string;
 interface NameMap {
-  [handle: string]: StoneMap,
+  sphereIdMap:    {[sphereAppId:   string] : {name: string, cloudId: string, uid: number,  uuid: string}}
+  locationIdMap:  {[locationAppId: string] : {name: string, cloudId: string, uid: number}}
+  stoneIdMap:     {[stoneAppId:    string] : {name: string, cloudId: string, uid: number, locationId: locationAppId}}
+  stoneHandleMap: {[stoneHandle:   string] : stoneAppId}
 }
 
 interface ConstellationParseResult {
@@ -47,7 +60,13 @@ interface CommanderPhase extends Phase {
 
 interface CommanderData {
   [commanderId: string] : {
-    tStart: number, tEnd: number, commands: CommandData, targets: any, phases: CommanderPhase[]
+    data: commandOptions,
+    tStart: number,
+    tEnd: number,
+    commands: {[commandId: string]: boolean },
+    targets: any,
+    phases: CommanderPhase[],
+    properties:Properties
   }
 }
 

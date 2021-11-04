@@ -54,7 +54,7 @@ export class SessionTimeline extends React.Component<{ data: ParseDataResult, ev
       <div style={{width:'100%'}}>
         <div ref={'viscontainer'} />
         <Backdrop open={this.state.overlayContent !== null} style={{zIndex:99999}} onClick={() => { this.setState({overlayContent: null})}}>
-          <Paper style={{maxHeight: '90vh', overflow:'auto', padding:20, width: '60vw'}} onClick={(event) => { event.stopPropagation() }}>{ this.state.overlayContent }</Paper>
+          <Paper style={{maxHeight: '90vh', overflow:'auto', padding:20, width: '80vw'}} onClick={(event) => { event.stopPropagation() }}>{ this.state.overlayContent }</Paper>
         </Backdrop>
       </div>
     );

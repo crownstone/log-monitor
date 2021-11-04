@@ -1,10 +1,10 @@
 import {BaseParser} from "./BaseParser";
 
-let nameMap = /MapProvider: logMap\W*(\[.*\])"]/
+let nameMap = /MapProvider: nameMap\W*({.*)"\]/
 
 export class NameMapParser extends BaseParser {
 
-  data = [];
+  data : any = {};
 
   load(item) {
     let mapDetected = item[1].match(nameMap);
@@ -16,13 +16,13 @@ export class NameMapParser extends BaseParser {
 
   export() {
     let resultMap = {};
-    for (let point of this.data) {
-      if (point.handle) {
-        resultMap[point.handle.toLowerCase()] = point
-      }
+    let handles = Object.keys(this.data.stoneHandleMap ?? {});
+    for (let handle of handles) {
+      resultMap[handle.toLowerCase()] = this.data.stoneHandleMap[handle];
     }
 
+    this.data.stoneHandleMap = resultMap;
 
-    this._exportData['nameMap'] = resultMap;
+    this._exportData['nameMap'] = this.data;
   }
 }

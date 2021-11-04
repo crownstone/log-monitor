@@ -1,11 +1,8 @@
 import React from "react";
-import * as vis from "vis-timeline/standalone/umd/vis-timeline-graph2d";
 import {Backdrop, Paper} from "@mui/material";
 import {CommanderPhaseTimeline} from "./CommanderPhaseTimeline";
 import {EventBusClass} from "../util/EventBus";
 import {DataFlowTimeline} from "./DataFlowTimeline";
-import {SessionDataFlowManager} from "../logic/DataFlowManager_sessions";
-import {SessionPhaseTimeline} from "./SessionPhaseTimeline";
 import {CommanderDataFlowManager} from "../logic/DataFlowManager_commanders";
 
 export class CommanderTimeline extends React.Component<{ data: ParseDataResult, eventBus: EventBusClass }, { overlayContent: any | null }> {
