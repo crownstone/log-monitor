@@ -5,7 +5,7 @@ export class DataFlowManagerBase {
 
   priority : string[] = []
 
-  itemThreshold = 2000;
+  itemThreshold = 1000;
 
   eventDataGroups : {[typeId: number]: any[]}  = {}
   rangeDataGroups : {[typeId: number] : any[]} = {}
@@ -25,14 +25,7 @@ export class DataFlowManagerBase {
     this.groupDataSet = new vis.DataSet([], {queue: true});
   }
 
-  load(data: ParseDataResult) {
-    throw new Error("OVERRIDE_BY_CHILD");
-  }
-
-  destroy() {
-    clearTimeout(this.getTimeout);
-    this.itemDataSet.off("*")
-    this.groupDataSet.off("*")
+  reset() {
     this.itemDataSet.clear();
     this.groupDataSet.clear();
     this.groupDataSet.flush();
@@ -41,13 +34,29 @@ export class DataFlowManagerBase {
     this.rangeDataGroups = {};
   }
 
+  load(data: ParseDataResult) {
+    this.reset();
+    this.loadSpecificData(data);
+  }
+
+  loadSpecificData(data: ParseDataResult) {
+    throw new Error("OVERRIDE_BY_CHILD");
+  }
+
+  destroy() {
+    clearTimeout(this.getTimeout);
+    this.itemDataSet.off("*")
+    this.groupDataSet.off("*")
+    this.reset();
+  }
+
   delayedGet(start,end, callback) {
     clearTimeout(this.getTimeout);
     this.getTimeout = setTimeout(() => { this.get(start,end); callback(); }, 200);
   }
 
   get(start: number, end: number) {
-    this.itemDataSet.clear()
+    this.itemDataSet.clear();
 
     let itemsAdded = 0;
     let endTime = -Infinity;

@@ -16,7 +16,7 @@ export class SessionDataFlowManager extends DataFlowManagerEvents {
     "unconnected",
   ]
 
-  load(data: ParseDataResult) {
+  loadSpecificData(data: ParseDataResult) {
     let session;
     let constellation = data?.constellation;
     let sessions = constellation?.sessions;

@@ -1,24 +1,16 @@
 import React, {useState} from "react";
 import { GetStaticProps } from 'next'
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import {Button, CircularProgress, Grid,} from "@mui/material";
+import { ThemeProvider } from '@mui/material/styles';
+import {Grid,} from "@mui/material";
 import {FileUtil} from "../src/util/FileUtil";
-import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import DynamicFeedIcon from '@mui/icons-material/DynamicFeed';
 import { colors } from '../src/styles/colors'
-import {AppRegistration} from "@mui/icons-material";
-import {EventBusClass} from "../src/util/EventBus";
-import {SessionTimeline} from "../src/timelines/SessionTimeline";
-import {CommanderTimeline} from "../src/timelines/CommanderTimeline";
 import {GlobalStateKeeper} from "../src/globalState/GlobalStateKeeper";
-import { Util } from "../src/util/Util"
 import {GuardianTheme} from "../src/styles/theme";
-import { AnimatedGrid } from "../src/components/animating/AnimatedGrid";
 import {SideBar} from "../src/components/pageElements/SideBar";
 import {LogOverview} from "../src/components/selection/LogOverview";
 import {TypeContainer} from "../src/components/selection/TypeOverview";
 import {Visualization} from "../src/components/visualizations/Visualization";
+import {SharedEventBus} from "../src/util/EventBus";
 
 export const getStaticProps: GetStaticProps = async (context) => {
   let paths = FileUtil.getUsers()
@@ -37,8 +29,6 @@ export default class FileOverview extends React.Component<any, any> {
       selectedUser: null,
       selectedDate: null,
       selectedType: null,
-      showSettings: false,
-      showHelp: false,
     }
   }
 
@@ -71,8 +61,8 @@ export default class FileOverview extends React.Component<any, any> {
             }}
             selectType={(data) => {this.setState({selectedType:data, showSettings: false, showHelp: false}); this.db.set('selectedType', data)}}
             viz={{
-              settings: () => { this.setState({showSettings: !this.state.showSettings})},
-              help:     () => { this.setState({showHelp: !this.state.showHelp})},
+              settings: () => { SharedEventBus.emit("SHOW_SETTINGS"); },
+              help:     () => { SharedEventBus.emit("SHOW_HELP"); },
             }}
             phase={phase}
           />
@@ -95,8 +85,6 @@ export default class FileOverview extends React.Component<any, any> {
             <Visualization
               user={this.state.selectedUser}
               date={this.state.selectedDate}
-              showSettings={this.state.showSettings}
-              showHelp={this.state.showHelp}
             />
           }
         </Grid>

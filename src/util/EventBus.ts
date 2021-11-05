@@ -94,4 +94,4 @@ export class EventBusClass {
 
 }
 
-export let eventBus : any = new EventBusClass("mainSingleton");
+export let SharedEventBus : any = new EventBusClass("mainSingleton");

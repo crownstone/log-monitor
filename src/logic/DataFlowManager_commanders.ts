@@ -3,7 +3,7 @@ import {DataFlowManagerEvents} from "./DataFlowManager_events";
 
 export class CommanderDataFlowManager extends DataFlowManagerEvents {
 
-  itemThreshold = 1000;
+  itemThreshold = 400;
   priority = [
     "public",
     "private",
@@ -11,8 +11,8 @@ export class CommanderDataFlowManager extends DataFlowManagerEvents {
   ]
 
   commanderType = null;
-  constructor(commanderType: string) {
-    super();
+  constructor(commanderType: string, options : ConstellationConfig = {}) {
+    super(options);
     this.commanderType = commanderType;
   }
 
@@ -30,7 +30,7 @@ export class CommanderDataFlowManager extends DataFlowManagerEvents {
     return commanderType;
   }
 
-  load(data: ParseDataResult) {
+  loadSpecificData(data: ParseDataResult) {
     let commander;
     let groups = {};
     let constellation = data?.constellation;
@@ -78,8 +78,8 @@ export class CommanderDataFlowManager extends DataFlowManagerEvents {
       }
     }
 
-    this.loadReboots(data)
-    this.loadLocalization(data)
+    this.loadReboots(data);
+    this.loadLocalization(data);
     this.loadStartEndTimes(data);
 
 

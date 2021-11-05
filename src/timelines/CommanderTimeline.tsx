@@ -1,23 +1,31 @@
 import React from "react";
 import {Backdrop, Paper} from "@mui/material";
 import {CommanderPhaseTimeline} from "./CommanderPhaseTimeline";
-import {EventBusClass} from "../util/EventBus";
+import {EventBusClass, SharedEventBus} from "../util/EventBus";
 import {DataFlowTimeline} from "./DataFlowTimeline";
 import {CommanderDataFlowManager} from "../logic/DataFlowManager_commanders";
 
-export class CommanderTimeline extends React.Component<{ data: ParseDataResult, eventBus: EventBusClass }, { overlayContent: any | null }> {
+export class CommanderTimeline extends React.Component<{
+  data: ParseDataResult,
+  eventBus: EventBusClass,
+  config: ConstellationConfig
+}, { overlayContent: any | null }> {
 
-  dfTimeline_public:    DataFlowTimeline;
-  dfTimeline_private:   DataFlowTimeline;
-  dfTimeline_broadcast: DataFlowTimeline;
+  dfTimeline_public:          DataFlowTimeline;
+  dfTimeline_private:         DataFlowTimeline;
+  dfTimeline_broadcast:       DataFlowTimeline;
+
   dataFlowManager_public:     CommanderDataFlowManager;
   dataFlowManager_private:    CommanderDataFlowManager;
   dataFlowManager_broadcast:  CommanderDataFlowManager;
 
+  unsubscribe = [];
+
   constructor(params) {
     super(params);
     this.state = {overlayContent: null};
-    this.dataFlowManager_public     = new CommanderDataFlowManager('public');
+
+    this.dataFlowManager_public     = new CommanderDataFlowManager('public', this.props.config);
     this.dataFlowManager_private    = new CommanderDataFlowManager('private');
     this.dataFlowManager_broadcast  = new CommanderDataFlowManager('broadcasters');
 
@@ -26,9 +34,7 @@ export class CommanderTimeline extends React.Component<{ data: ParseDataResult, 
     this.dfTimeline_broadcast = new DataFlowTimeline(this.dataFlowManager_broadcast, this.props.eventBus);
   }
 
-  componentDidMount() {
-    const { viscontainer_public, viscontainer_private, viscontainer_broadcast } = this.refs;
-
+  refreshData() {
     console.time("PreparingData");
     this.dataFlowManager_public.load(this.props.data);
     this.dataFlowManager_private.load(this.props.data);
@@ -40,7 +46,12 @@ export class CommanderTimeline extends React.Component<{ data: ParseDataResult, 
     this.dataFlowManager_private.getAll();
     this.dataFlowManager_broadcast.getAll();
     console.timeEnd("GettingData");
+  }
 
+  componentDidMount() {
+    const { viscontainer_public, viscontainer_private, viscontainer_broadcast } = this.refs;
+
+    this.refreshData();
 
     this.dfTimeline_public.create(viscontainer_public, {cluster: { maxItems: 20 }, showMajorLabels: false, showMinorLabels: false})
     this.dfTimeline_private.create(viscontainer_private, {cluster: { maxItems: 20 }, showMajorLabels: false, showMinorLabels: false})
@@ -54,9 +65,16 @@ export class CommanderTimeline extends React.Component<{ data: ParseDataResult, 
       }
     };
 
-    this.dfTimeline_public.on('select', clickHandler);
-    this.dfTimeline_private.on('select', clickHandler);
+    this.dfTimeline_public.on('select',    clickHandler);
+    this.dfTimeline_private.on('select',   clickHandler);
     this.dfTimeline_broadcast.on('select', clickHandler);
+
+    this.unsubscribe.push(this.props.eventBus.on("REFRESH_DATA", () => {
+      this.refreshData();
+      this.dfTimeline_public.drawMarkers();
+      this.dfTimeline_private.drawMarkers();
+      this.dfTimeline_broadcast.drawMarkers();
+    }));
   }
 
   componentWillUnmount() {
@@ -67,6 +85,8 @@ export class CommanderTimeline extends React.Component<{ data: ParseDataResult, 
     this.dfTimeline_public.destroy();
     this.dfTimeline_private.destroy();
     this.dfTimeline_broadcast.destroy();
+
+    this.unsubscribe.forEach((unsub) => { unsub(); })
   }
 
   render() {

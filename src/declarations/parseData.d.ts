@@ -2,13 +2,13 @@
 type RebootData = [number, number];
 
 interface ParseDataResult {
-  reboots:       RebootData[],
-  constellation: ConstellationParseResult,
-  nameMap:       NameMap,
-  localization:  LocalizationParseResult,
+  reboots?:       RebootData[],
+  constellation?: ConstellationParseResult,
+  nameMap?:       NameMap,
+  localization?:  LocalizationParseResult,
 
-  startTime: number,
-  endTime:   number,
+  startTime?: number,
+  endTime?:   number,
 }
 
 interface LocalizationParseResult {
@@ -93,3 +93,4 @@ interface CommandIdToCommanderIdMap {
 interface HandleToCommandMap {
   [handle: string]: { time: number, commandId: string }[]
 }
+

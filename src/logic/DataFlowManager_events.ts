@@ -2,6 +2,14 @@ import {DataFlowManagerBase} from "./DataFlowManagerBase";
 
 export class DataFlowManagerEvents extends DataFlowManagerBase {
 
+  options: DataFlowOptions
+
+  constructor(options : ConstellationConfig = {}) {
+    super();
+    this.options = options?.dataflow ?? {};
+  }
+
+
   loadReboots(data: ParseDataResult) {
     let reboots = data.reboots;
     this.eventDataGroups['reboots'] = [];
@@ -17,15 +25,22 @@ export class DataFlowManagerEvents extends DataFlowManagerBase {
     this.eventDataGroups['localization'] = [];
     if (!localization) { return }
     let localizationCount = 0;
-    for (let localizationData of localization.locations) {
-      let markerId = 'localization' + localizationCount++;
-      let locationName = data.nameMap?.locationIdMap?.[localizationData.data.locationId]?.name || localizationData.data.locationId;
-      this.eventDataGroups['localization'].push({id: markerId, time: localizationData.time, content: locationName})
+
+
+    if (this.options.showRoomLocalization === true) {
+      for (let localizationData of localization.locations) {
+        let markerId = 'localization' + localizationCount++;
+        let locationName = data.nameMap?.locationIdMap?.[localizationData.data.locationId]?.name || localizationData.data.locationId;
+        this.eventDataGroups['localization'].push({id: markerId, time: localizationData.time, content: locationName})
+      }
     }
-    for (let localizationData of localization.spheres) {
-      let markerId = 'sphere' + localizationCount++;
-      let sphereName = data.nameMap?.sphereIdMap?.[localizationData.data.sphereId]?.name || localizationData.data.sphereId;
-      this.eventDataGroups['localization'].push({id: markerId, time: localizationData.time, content: localizationData.label + "<br/>" + sphereName})
+
+    if (this.options.showSphereLocalization === true) {
+      for (let localizationData of localization.spheres) {
+        let markerId = 'sphere' + localizationCount++;
+        let sphereName = data.nameMap?.sphereIdMap?.[localizationData.data.sphereId]?.name || localizationData.data.sphereId;
+        this.eventDataGroups['localization'].push({id: markerId, time: localizationData.time, content: localizationData.label + "<br/>" + sphereName})
+      }
     }
   }
 
