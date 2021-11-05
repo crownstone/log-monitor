@@ -5,6 +5,7 @@ export class DataFlowManagerEvents extends DataFlowManagerBase {
   loadReboots(data: ParseDataResult) {
     let reboots = data.reboots;
     this.eventDataGroups['reboots'] = [];
+    if (!reboots) { return }
     for (let reboot of reboots) {
       let markerId = 'reboot' + reboot[1];
       this.eventDataGroups['reboots'].push({id: markerId, time: reboot[0], content: 'Reboot'})
@@ -14,6 +15,7 @@ export class DataFlowManagerEvents extends DataFlowManagerBase {
   loadLocalization(data: ParseDataResult) {
     let localization = data.localization;
     this.eventDataGroups['localization'] = [];
+    if (!localization) { return }
     let localizationCount = 0;
     for (let localizationData of localization.locations) {
       let markerId = 'localization' + localizationCount++;

@@ -3,7 +3,7 @@ import {DataFlowManagerEvents} from "./DataFlowManager_events";
 
 export class CommanderDataFlowManager extends DataFlowManagerEvents {
 
-  itemThreshold = 2000;
+  itemThreshold = 1000;
   priority = [
     "public",
     "private",
@@ -33,47 +33,49 @@ export class CommanderDataFlowManager extends DataFlowManagerEvents {
   load(data: ParseDataResult) {
     let commander;
     let groups = {};
-    let constellation = data.constellation;
+    let constellation = data?.constellation;
+    let commanders = constellation?.commanders;
 
     groups[this.commanderType] = {id: this.commanderType, content:this.commanderType, style:'width: 300px'};
 
+    if (commanders) {
+      for (let commanderId in commanders) {
+        let className = 'connectingFailed';
+        commander = commanders[commanderId];
+        let commanderType = this.getCommanderType(commander);
+        if (this.commanderType !== commanderType) {
+          continue;
+        }
 
-    for (let commanderId in constellation.commanders) {
-      let className = 'connectingFailed';
-      commander = constellation.commanders[commanderId];
-      let commanderType = this.getCommanderType(commander);
-      if (this.commanderType !== commanderType) {
-        continue;
-      }
+        if (commander.properties[SessionManagerPhases.sessionTimeout]) {
+          className = 'TIMEOUT'
+        }
+        else if (commander.properties[SessionBrokerPhases.success] || commander.properties[CommandPhases.broadcastSuccess]) {
+          className = 'performedCommandSuccess'
+        }
+        else if (commander.properties[CommandPhases.duplicate] || commander.properties[CommandPhases.broadcastDuplicate]) {
+          className = 'duplicateCommand'
+        }
+        else if (commander.properties[CommandPhases.broadcastError]) {
+          className = 'performedCommandFailed'
+        }
 
-      if (commander.properties[SessionManagerPhases.sessionTimeout]) {
-        className = 'TIMEOUT'
-      }
-      else if (commander.properties[SessionBrokerPhases.success] || commander.properties[CommandPhases.broadcastSuccess]) {
-        className = 'performedCommandSuccess'
-      }
-      else if (commander.properties[CommandPhases.duplicate] || commander.properties[CommandPhases.broadcastDuplicate]) {
-        className = 'duplicateCommand'
-      }
-      else if (commander.properties[CommandPhases.broadcastError]) {
-        className = 'performedCommandFailed'
-      }
+        if (!this.rangeDataGroups[this.commanderType]) {
+          this.rangeDataGroups[this.commanderType] = [];
+        }
 
-      if (!this.rangeDataGroups[this.commanderType]) {
-        this.rangeDataGroups[this.commanderType] = [];
+        this.rangeDataGroups[this.commanderType].push({
+          id:      commanderId,
+          start:   commander.tStart,
+          end:     commander.tEnd,
+          content: commander.phases[1].data.commandType,
+          group:   this.commanderType,
+          className
+        });
+
+        this.startTime = Math.min(this.startTime, commander.tStart);
+        this.endTime   = Math.max(this.endTime,   commander.tEnd);
       }
-
-      this.rangeDataGroups[this.commanderType].push({
-        id:      commanderId,
-        start:   commander.tStart,
-        end:     commander.tEnd,
-        content: commander.phases[1].data.commandType,
-        group:   this.commanderType,
-        className
-      });
-
-      this.startTime = Math.min(this.startTime, commander.tStart);
-      this.endTime   = Math.max(this.endTime,   commander.tEnd);
     }
 
     this.loadReboots(data)

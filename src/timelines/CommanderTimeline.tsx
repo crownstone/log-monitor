@@ -7,9 +7,9 @@ import {CommanderDataFlowManager} from "../logic/DataFlowManager_commanders";
 
 export class CommanderTimeline extends React.Component<{ data: ParseDataResult, eventBus: EventBusClass }, { overlayContent: any | null }> {
 
-  dataFlowTimeline_public:    DataFlowTimeline;
-  dataFlowTimeline_private:   DataFlowTimeline;
-  dataFlowTimeline_broadcast: DataFlowTimeline;
+  dfTimeline_public:    DataFlowTimeline;
+  dfTimeline_private:   DataFlowTimeline;
+  dfTimeline_broadcast: DataFlowTimeline;
   dataFlowManager_public:     CommanderDataFlowManager;
   dataFlowManager_private:    CommanderDataFlowManager;
   dataFlowManager_broadcast:  CommanderDataFlowManager;
@@ -21,9 +21,9 @@ export class CommanderTimeline extends React.Component<{ data: ParseDataResult, 
     this.dataFlowManager_private    = new CommanderDataFlowManager('private');
     this.dataFlowManager_broadcast  = new CommanderDataFlowManager('broadcasters');
 
-    this.dataFlowTimeline_public    = new DataFlowTimeline(this.dataFlowManager_public, this.props.eventBus);
-    this.dataFlowTimeline_private   = new DataFlowTimeline(this.dataFlowManager_private, this.props.eventBus);
-    this.dataFlowTimeline_broadcast = new DataFlowTimeline(this.dataFlowManager_broadcast, this.props.eventBus);
+    this.dfTimeline_public    = new DataFlowTimeline(this.dataFlowManager_public, this.props.eventBus);
+    this.dfTimeline_private   = new DataFlowTimeline(this.dataFlowManager_private, this.props.eventBus);
+    this.dfTimeline_broadcast = new DataFlowTimeline(this.dataFlowManager_broadcast, this.props.eventBus);
   }
 
   componentDidMount() {
@@ -42,9 +42,9 @@ export class CommanderTimeline extends React.Component<{ data: ParseDataResult, 
     console.timeEnd("GettingData");
 
 
-    this.dataFlowTimeline_public.create(viscontainer_public, {cluster: { maxItems: 20 }, showMajorLabels: false, showMinorLabels: false})
-    this.dataFlowTimeline_private.create(viscontainer_private, {cluster: { maxItems: 20 }, showMajorLabels: false, showMinorLabels: false})
-    this.dataFlowTimeline_broadcast.create(viscontainer_broadcast, {stack: false})
+    this.dfTimeline_public.create(viscontainer_public, {cluster: { maxItems: 20 }, showMajorLabels: false, showMinorLabels: false})
+    this.dfTimeline_private.create(viscontainer_private, {cluster: { maxItems: 20 }, showMajorLabels: false, showMinorLabels: false})
+    this.dfTimeline_broadcast.create(viscontainer_broadcast, {stack: false})
 
     let clickHandler = (properties) => {
       if (properties.items) {
@@ -54,9 +54,9 @@ export class CommanderTimeline extends React.Component<{ data: ParseDataResult, 
       }
     };
 
-    this.dataFlowTimeline_public.on('select', clickHandler);
-    this.dataFlowTimeline_private.on('select', clickHandler);
-    this.dataFlowTimeline_broadcast.on('select', clickHandler);
+    this.dfTimeline_public.on('select', clickHandler);
+    this.dfTimeline_private.on('select', clickHandler);
+    this.dfTimeline_broadcast.on('select', clickHandler);
   }
 
   componentWillUnmount() {
@@ -64,9 +64,9 @@ export class CommanderTimeline extends React.Component<{ data: ParseDataResult, 
     this.dataFlowManager_private.destroy();
     this.dataFlowManager_broadcast.destroy();
 
-    this.dataFlowTimeline_public.destroy();
-    this.dataFlowTimeline_private.destroy();
-    this.dataFlowTimeline_broadcast.destroy();
+    this.dfTimeline_public.destroy();
+    this.dfTimeline_private.destroy();
+    this.dfTimeline_broadcast.destroy();
   }
 
   render() {
