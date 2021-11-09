@@ -1,8 +1,8 @@
 import React from "react";
 import * as vis from "vis-timeline/standalone/umd/vis-timeline-graph2d";
 import {TimelineOptions} from "vis-timeline/types";
-import {getGroupName} from "../parsers/util";
-import {CommandPhases, SessionBrokerPhases, SessionManagerPhases} from "../parsers/app/ConstellationParser";
+import {getGroupName} from "../../parsers/util";
+import {CommandPhases, SessionBrokerPhases, SessionManagerPhases} from "../../parsers/app/ConstellationParser";
 
 const COMMANDER_GROUP = "Commander";
 

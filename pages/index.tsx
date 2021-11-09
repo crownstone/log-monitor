@@ -85,6 +85,7 @@ export default class FileOverview extends React.Component<any, any> {
             <Visualization
               user={this.state.selectedUser}
               date={this.state.selectedDate}
+              type={this.state.selectedType}
             />
           }
         </Grid>

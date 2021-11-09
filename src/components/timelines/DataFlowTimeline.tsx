@@ -1,7 +1,7 @@
 import React from "react";
-import {EventBusClass} from "../util/EventBus";
+import {EventBusClass} from "../../util/EventBus";
 import * as vis from "vis-timeline/standalone/umd/vis-timeline-graph2d";
-import {DataFlowManagerBase} from "../logic/DataFlowManagerBase";
+import {DataFlowManagerBase} from "../../logic/DataFlowManagerBase";
 
 
 export class DataFlowTimeline {

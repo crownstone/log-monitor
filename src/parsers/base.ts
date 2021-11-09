@@ -3,6 +3,7 @@ import {ConstellationParser} from "./app/ConstellationParser";
 import {NameMapParser} from "./app/NameMapParser";
 import {FileUtil} from "../util/FileUtil";
 import {LocalizationParser} from "./app/LocalizationParser";
+import {CloudParser} from "./app/CloudParser";
 
 export function parseConsumerAppFileByLine(user, date, result, maxLines: number = 0, force=false) {
   return new Promise<void>((resolve, reject) => {
@@ -27,6 +28,7 @@ export function parseConsumerAppFileByLine(user, date, result, maxLines: number 
       new ConstellationParser(result),
       new NameMapParser(result),
       new LocalizationParser(result),
+      new CloudParser(result),
     ]
     let total = 0;
     let firstTime = null;

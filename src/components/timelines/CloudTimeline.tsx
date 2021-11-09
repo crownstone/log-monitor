@@ -1,19 +1,18 @@
 import React from "react";
 import {Backdrop, Paper} from "@mui/material";
-import {SessionPhaseTimeline} from "./SessionPhaseTimeline";
-import {EventBusClass} from "../util/EventBus";
-import {SessionDataFlowManager} from "../logic/DataFlowManager_sessions";
+import {EventBusClass} from "../../util/EventBus";
 import {DataFlowTimeline} from "./DataFlowTimeline";
+import {CloudDataFlowManager} from "../../logic/DataFlowManager_cloud";
 
-export class SessionTimeline extends React.Component<{ data: ParseDataResult, eventBus: EventBusClass }, { overlayContent: any | null }> {
+export class CloudTimeline extends React.Component<{ data: ParseDataResult, eventBus: EventBusClass, cloudDataCallback: (d) => void }, { overlayContent: any | null }> {
 
   dataFlowTimeline: DataFlowTimeline;
-  dataFlowManager: SessionDataFlowManager;
+  dataFlowManager: CloudDataFlowManager;
 
-  constructor(params) {
-    super(params);
+  constructor(props) {
+    super(props);
     this.state = {overlayContent: null};
-    this.dataFlowManager = new SessionDataFlowManager();
+    this.dataFlowManager = new CloudDataFlowManager();
     this.dataFlowTimeline = new DataFlowTimeline(this.dataFlowManager, this.props.eventBus);
   }
 
@@ -36,8 +35,8 @@ export class SessionTimeline extends React.Component<{ data: ParseDataResult, ev
     this.dataFlowTimeline.create(viscontainer, options)
     this.dataFlowTimeline.on('select', (properties) => {
       if (properties.items) {
-        if (this.props.data.constellation.sessions[properties.items]?.phases) {
-          this.setState({overlayContent: <SessionPhaseTimeline sessionId={properties.items} data={this.props.data.constellation}/>});
+        if (this.props.data?.cloud?.requests?.[properties.items]) {
+          this.props.cloudDataCallback(this.props.data.cloud.requests[properties.items])
         }
       }
     });

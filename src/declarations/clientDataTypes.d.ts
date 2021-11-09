@@ -7,3 +7,7 @@ interface ConstellationConfig {
 
   dataflow?: DataFlowOptions
 }
+
+interface CloudConfig {
+
+}

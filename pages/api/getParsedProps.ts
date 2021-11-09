@@ -4,9 +4,33 @@ import {parseConsumerAppFileByLine} from "../../src/parsers/base";
 
 export default async (req, res) => {
   console.time("Parsing")
-  let result = {};
-  await parseConsumerAppFileByLine(req.body.user,req.body.date, result);
+  let result : ParseDataResult = {};
+  await parseConsumerAppFileByLine(req.body.user, req.body.date, result);
   console.timeEnd("Parsing")
-  res.end(JSON.stringify(result))
+
+
+
+  if (req.body.type === 'cloud') {
+    res.end(JSON.stringify({
+      cloud:     result.cloud,
+      reboots:   result.reboots,
+      startTime: result.startTime,
+      endTime:   result.endTime
+    }));
+    return;
+  }
+
+  if (req.body.type === 'constellation') {
+    res.end(JSON.stringify({
+      reboots:       result.reboots,
+      constellation: result.constellation,
+      nameMap:       result.nameMap,
+      localization:  result.localization,
+      startTime:     result.startTime,
+      endTime:       result.endTime
+    }));
+    return;
+  }
+
 }
 

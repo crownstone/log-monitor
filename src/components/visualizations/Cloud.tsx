@@ -1,12 +1,11 @@
 import React, {useState} from "react";
 import {Backdrop, Button, Checkbox, CircularProgress, FormControlLabel, FormGroup, Grid, Paper} from "@mui/material";
-import {SessionTimeline} from "../timelines/SessionTimeline";
-import {CommanderTimeline} from "../timelines/CommanderTimeline";
 import {Util} from "../../util/Util";
 import {VisualizationBase} from "./VisualizationBase";
+import {CloudTimeline} from "../timelines/CloudTimeline";
 
 
-function getConstellationConfig() : ConstellationConfig {
+function getCloudConfig() : CloudConfig {
   return {
     dataflow: {
       showRoomLocalization: false,
@@ -15,24 +14,29 @@ function getConstellationConfig() : ConstellationConfig {
   }
 }
 
-export class Constellation extends VisualizationBase {
+export class Cloud extends VisualizationBase {
 
-  config: ConstellationConfig = getConstellationConfig();
+  config: CloudConfig = getCloudConfig();
+
+  requestData = null
 
   constructor(props) {
-    super(props, 'constellation')
+    super(props, 'cloud');
   }
-
 
   render() {
     if (this.state.drawData) {
       return (
         <Grid item style={{height:'100vh', flex:1, overflow:'auto'}}>
-          <SessionTimeline   data={this.data} eventBus={this.eventBus} />
-          <CommanderTimeline data={this.data} eventBus={this.eventBus} config={this.config} />
+          <CloudTimeline
+            data={this.data}
+            eventBus={this.eventBus}
+            cloudDataCallback={(data) => { this.requestData = data; this.forceUpdate() }}
+          />
+
           <Backdrop open={this.state.showConfig} style={{zIndex:99999}} onClick={() => { this.setState({showConfig: false})}}>
             <Paper style={{maxHeight: '100vh', overflow:'auto', padding:20, width: '50vw'}} onClick={(event) => { event.stopPropagation() }}>
-              <ConstellationSettings
+              <CloudSettings
                 config={this.config}
                 close={(config) => {
                   Util.deepExtend(this.config, config)
@@ -41,12 +45,14 @@ export class Constellation extends VisualizationBase {
                 }}/>
             </Paper>
           </Backdrop>
-
           <Backdrop open={this.state.showHelp} style={{zIndex:99999}} onClick={() => { this.setState({showHelp: false})}}>
             <Paper style={{maxHeight: '100vh', overflow:'auto', padding:20, width: '50vw'}} onClick={(event) => { event.stopPropagation() }}>
-              <ConstellationHelp />
+              <CloudHelp />
             </Paper>
           </Backdrop>
+
+          { this.requestData && <RequestDetails request={this.requestData} /> }
+
         </Grid>
       );
     }
@@ -67,45 +73,39 @@ export class Constellation extends VisualizationBase {
   }
 }
 
+function RequestDetails(props) {
+  let requestData : CloudRequest = props.request;
+  return (
+    <Grid container flexDirection={"row"}>
+      <Grid item style={{padding:10}} xs={6}>
+        <h3>Request</h3>
+        <p style={{whiteSpace:'pre-wrap'}}>{JSON.stringify(requestData?.request, undefined, 2)}</p>
+      </Grid>
+      <Grid item style={{padding:10}} xs={6}>
+        <h3>{`Reply in ${requestData.tEnd - requestData.tStart}ms`}</h3>
+        <p style={{whiteSpace:'pre-wrap'}}>{JSON.stringify(requestData?.reply, undefined, 2)}</p>
+      </Grid>
+    </Grid>
+  )
+}
 
 
-function ConstellationSettings(props) {
-  let [sphereLevelLocalization, setSphereLevelLocalization] = useState(props.config.dataflow.showSphereLocalization);
-  let [roomLevelLocalization,   setRoomLevelLocalization]   = useState(props.config.dataflow.showRoomLocalization);
-
+function CloudSettings(props) {
   return (
     <FormGroup>
-      <h1>Constellation visualization settings</h1>
-      <FormControlLabel control={
-        <Checkbox
-          onChange={() => { setSphereLevelLocalization(!sphereLevelLocalization)}}
-          checked={sphereLevelLocalization}
-        />}
-        label="Show sphere level localization"
-      />
-      <FormControlLabel control={
-        <Checkbox
-          onChange={() => { setRoomLevelLocalization(!roomLevelLocalization)}}
-          checked={roomLevelLocalization}
-        />}
-        label="Show room level localization"
-      />
+      <h1>Cloud visualization settings</h1>
+      None yet.
       <Button
-        onClick={() => { props.close({
-          dataflow: {
-            showSphereLocalization: sphereLevelLocalization,
-            showRoomLocalization: roomLevelLocalization,
-          }
-        })}}
+        onClick={() => { props.close({ })}}
       >Save</Button>
     </FormGroup>
   )
 }
 
-function ConstellationHelp(props) {
+function CloudHelp(props) {
   return (
     <div>
-      <h1>Constellation visualization help</h1>
+      <h1>Cloud visualization help</h1>
       None yet.
     </div>
   )

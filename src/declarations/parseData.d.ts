@@ -6,9 +6,21 @@ interface ParseDataResult {
   constellation?: ConstellationParseResult,
   nameMap?:       NameMap,
   localization?:  LocalizationParseResult,
+  cloud?:         CloudParseResult,
 
   startTime?: number,
   endTime?:   number,
+}
+
+interface CloudParseResult {
+  requests: CloudRequest,
+  syncs: {tStart: number, tEnd: number, error?: boolean}[]
+}
+interface CloudRequest {
+  tStart: number,
+  tEnd: number,
+  request: { url: string, config: any }
+  reply:   { url: string, result: any }
 }
 
 interface LocalizationParseResult {
@@ -94,3 +106,14 @@ interface HandleToCommandMap {
   [handle: string]: { time: number, commandId: string }[]
 }
 
+
+interface parserData {
+  type: string,
+  label: string,
+  mapping: MappingData[],
+  regex: RegExp
+}
+
+type MappingData = string | {[key: string]: (data: string) => any }
+
+type ItemData = [number, string];

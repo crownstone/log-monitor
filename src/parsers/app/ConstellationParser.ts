@@ -95,7 +95,7 @@ export const SessionManagerPhases = {
 
 let fromJSON = (d) => { d = d.replace(/\\/g,''); return JSON.parse(d); };
 
-  let sessionParsers = [
+let sessionParsers : parserData[] = [
   {type:'commander',     label:'created',           mapping: [{targets:(d) => { return d.replace(/"/,'').split(",")}},{commanderOptions: fromJSON}], regex:/Commander: Created for target",\[*([\w\-,"]*)\W*,"options:","({.*}*)"/},
   {type:'commander',     label:'loadAction',        mapping: ['commandType','allowMeshRelays','commanderId'], regex:/Commander: Loading command\W*([\w-]*)\W*([\w]*),"id:","([\w-]*)/},
   {type:'commander',     label:'failure',           mapping: ['errorMessage','commanderId'], regex:/Commander: Failed to load command\W*([\w]*)\W*id:\W*([\w-]*)/},
@@ -166,11 +166,11 @@ class SessionCollector {
 
 class CommanderCollector {
 
-  commanderData : CommanderData = {}
-  handleMap : HandleToCommandMap = {}
+  commanderData : CommanderDataMap   = {}
+  handleMap     : HandleToCommandMap = {}
+  commandData   : CommandData        = {};
   commandId2CommanderIdMap : CommandIdToCommanderIdMap = {}
-  commandId2CommandMap : CommandIdToCommandMap = {}
-  commandData : CommandData = {};
+  commandId2CommandMap     : CommandIdToCommandMap     = {}
 
   _ensureCommanderEntry(item, commanderId) {
     if (this.commanderData[commanderId] === undefined) {
@@ -305,22 +305,7 @@ export class ConstellationParser extends BaseParser {
     }
   }
 
-  search(item, parser) {
-    let regexSearch = item[1].match(parser.regex);
-    if (!regexSearch) return false;
-
-    let parseResult = {};
-    let index = 1;
-    for (let mapData of parser.mapping) {
-      if (typeof mapData === 'object') {
-        let key = Object.keys(mapData)[0];
-        parseResult[key] = mapData[key](regexSearch[index++]);
-      }
-      else {
-        parseResult[mapData] = regexSearch[index++];
-      }
-    }
-
+  handleParseResult(item, parser, parseResult) {
     switch (parser.type) {
       case 'session':
         this.sessionCollector.collect(item, parser, parseResult); break;
@@ -333,7 +318,5 @@ export class ConstellationParser extends BaseParser {
       case 'sessionManager':
         this.commanderCollector.collectSessionManager(item, parser, parseResult); break;
     }
-
-    return true;
   }
 }
