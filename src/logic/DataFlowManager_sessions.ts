@@ -6,7 +6,7 @@ type SessionType = "unconnected" | "connecting" | "connectingFailed" | "connecte
 
 export class SessionDataFlowManager extends DataFlowManagerEvents {
 
-  itemThreshold = 1000;
+  itemThreshold = 1200;
   priority = [
     "ERROR",
     "connectingFailed",

@@ -1,11 +1,10 @@
 import * as vis from "vis-timeline/standalone/umd/vis-timeline-graph2d";
-import {Util} from "../util/Util";
 
 export class DataFlowManagerBase {
 
   priority : string[] = []
 
-  itemThreshold = 1000;
+  itemThreshold = 1300;
 
   eventDataGroups : {[typeId: number]: any[]}  = {}
   rangeDataGroups : {[typeId: number] : any[]} = {}
@@ -52,45 +51,49 @@ export class DataFlowManagerBase {
 
   delayedGet(start,end, callback) {
     clearTimeout(this.getTimeout);
-    this.getTimeout = setTimeout(() => { this.get(start,end); callback(); }, 200);
+    this.getTimeout = setTimeout(() => { this.get(start,end); callback(); }, 600);
   }
 
   get(start: number, end: number) {
     this.itemDataSet.clear();
 
-    let itemsAdded = 0;
     let endTime = -Infinity;
-    let broken = false;
+    let aborted = false;
 
+    let itemCount = 0;
+    let items = [];
     for (let type of this.priority) {
       let typeData = this.rangeDataGroups[type];
+      let itemCandidates = []
       if (typeData) {
-        let minIndex = Util.binSearch(start, typeData, 'end');
-        let maxIndex = Util.binSearch(end, typeData, 'start');
+        for (let datapoint of typeData) {
+          // end in between
+          if (datapoint.end && datapoint.end >= start && datapoint.end <= end) {
+            itemCount++;
+            itemCandidates.push(datapoint);
+            endTime = Math.max(datapoint.end, endTime);
+          }
+          // start in between
+          else if (datapoint.start >= start && datapoint.start <= end) {
+            itemCount++;
+            itemCandidates.push(datapoint);
+            endTime = Math.max(datapoint.start, endTime);
+          }
 
-        if (!minIndex) { minIndex = 0; }
-        if (!maxIndex) { maxIndex = typeData.length-1; }
-
-        let itemCount = maxIndex - minIndex;
-
-        if (itemsAdded + itemCount > this.itemThreshold) {
-          if (itemsAdded >= this.itemThreshold) {
-            broken = true;
+          if (itemCount >= this.itemThreshold) {
+            aborted = true;
             break;
           }
-          else {
-            maxIndex = this.itemThreshold - itemsAdded + minIndex;
-          }
         }
-
-        endTime = Math.max(typeData[maxIndex].start, endTime);
-        itemsAdded += maxIndex - minIndex;
-        this.itemDataSet.add(typeData.slice(minIndex, maxIndex+1));
+      }
+      if (!aborted || items.length == 0) {
+        items = items.concat(itemCandidates);
       }
     }
+    this.itemDataSet.add(items);
 
     this.breakTime = endTime;
-    if (!broken) {
+    if (!aborted || this.breakTime === end) {
       this.breakTime = null;
     }
 

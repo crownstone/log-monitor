@@ -3,7 +3,7 @@ import {DataFlowManagerEvents} from "./DataFlowManager_events";
 
 export class CommanderDataFlowManager extends DataFlowManagerEvents {
 
-  itemThreshold = 400;
+  itemThreshold = 800;
   priority = [
     "public",
     "private",

@@ -15,7 +15,7 @@ export class GlobalStateKeeper {
       return
     }
 
-    if (Date.now() - Number(lastTime) > 24*3600*1000) {
+    if (Date.now() - Number(lastTime) > 12*3600*1000) {
       this.clear();
       return;
     }

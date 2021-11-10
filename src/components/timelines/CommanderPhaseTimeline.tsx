@@ -23,9 +23,7 @@ export class CommanderPhaseTimeline extends React.Component<{ data: ParseDataRes
     let endT = -Infinity;
     let constellation = this.props.data.constellation;
     let commanders = constellation.commanders;
-    let commander = commanders[this.props.commanderId];
     let phases = commanders[this.props.commanderId].phases;
-    let commands = constellation.commands;
     let nameMap = this.props.data.nameMap;
 
     let groups = {};
