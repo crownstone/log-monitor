@@ -43,10 +43,10 @@ export function preProcessConsumerApp(data: string) {
 
 
 export function getGroupName(nameMap : NameMap, handle : string) : string {
-  let id = nameMap.stoneHandleMap[handle.toLowerCase()];
-  let stoneMap = nameMap.stoneIdMap[id];
-  if (stoneMap === undefined) { return handle; }
-  let locationName = nameMap.locationIdMap[stoneMap.locationId]?.name
+  let id = nameMap.stoneHandleMap?.[handle.toLowerCase()] ?? null;
+  let stoneMap = nameMap.stoneIdMap?.[id] ?? null;
+  if (stoneMap === null) { return handle; }
+  let locationName = nameMap.locationIdMap?.[stoneMap.locationId]?.name ?? "unknown"
 
   return `${stoneMap.uid}: ${stoneMap.name} in ${locationName}`;
 }

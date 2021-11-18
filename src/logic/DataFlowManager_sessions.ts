@@ -66,7 +66,9 @@ export class SessionDataFlowManager extends DataFlowManagerEvents {
 
     this.loadReboots(data);
     this.loadStartEndTimes(data);
-
+    for (let key in this.rangeDataGroups) {
+      this.rangeDataGroups[key].sort((a,b) => { return a.end - b.end})
+    }
     this.groupDataSet.add(Object.values(groups));
   }
 

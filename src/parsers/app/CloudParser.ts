@@ -29,6 +29,7 @@ class CloudCollecter {
       }, reply:{}};
     }
     else if (parser.label === 'reply') {
+      if (this.data[parseResult.id] === undefined) { return; }
       this.data[parseResult.id].tEnd = item[0];
       this.data[parseResult.id].reply = {
         result: parseResult.result,

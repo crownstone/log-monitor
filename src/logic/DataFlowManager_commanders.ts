@@ -18,7 +18,7 @@ export class CommanderDataFlowManager extends DataFlowManagerEvents {
 
   getCommanderType(commander: CommanderData) {
     let commanderType = "public";
-    if (commander.data.private) {
+    if (commander.data && commander.data.private) {
       commanderType = 'private'
     }
     else if (commander.targets.length > 0 && commander.targets[0] === "BROADCAST") {
@@ -82,7 +82,9 @@ export class CommanderDataFlowManager extends DataFlowManagerEvents {
     this.loadLocalization(data);
     this.loadStartEndTimes(data);
 
-
+    for (let key in this.rangeDataGroups) {
+      this.rangeDataGroups[key].sort((a,b) => { return a.end - b.end})
+    }
     this.groupDataSet.add(Object.values(groups));
   }
 

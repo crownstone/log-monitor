@@ -4,7 +4,6 @@ export class CloudDataFlowManager extends DataFlowManagerEvents {
 
   itemThreshold = 1000;
   priority = [
-    "syncs",
     "cloud",
   ]
 
@@ -46,18 +45,21 @@ export class CloudDataFlowManager extends DataFlowManagerEvents {
       this.endTime = Math.max(this.endTime, cloudItem.tEnd);
     }
 
-    groups['syncs'] = {id: 'syncs', content: 'Sync sessions', style:'width: 430px'};
+    groups['cloud'] = {id: 'syncs', content: 'Sync sessions', style:'width: 430px'};
     for (let sync of syncs) {
       let className = 'performedCommandSuccess';
       if (sync.error) {
         className = 'performedCommandFailed';
       }
-      this.rangeDataGroups['syncs'].push({start: sync.tStart, end: sync.tEnd, group: 'syncs', className});
+      this.rangeDataGroups['cloud'].push({start: sync.tStart, end: sync.tEnd, group: 'syncs', className});
     }
-
     this.loadReboots(data);
     this.loadStartEndTimes(data);
 
+
+    for (let key in this.rangeDataGroups) {
+      this.rangeDataGroups[key].sort((a,b) => { return a.end - b.end})
+    }
     this.groupDataSet.add(Object.values(groups));
   }
 

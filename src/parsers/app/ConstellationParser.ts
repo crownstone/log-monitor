@@ -212,7 +212,7 @@ class CommanderCollector {
     if (command) {
       commanderId = command.commanderId;
       commandId   = command.id;
-      
+
       this.commandId2CommanderIdMap[commandId] = command.commanderId;
       this._ensureCommanderEntry(item, commanderId);
 
@@ -277,6 +277,7 @@ class CommanderCollector {
       this.commanderData[commanderId].tEnd   = Math.max( this.commanderData[commanderId].tEnd, item[0])
     }
   }
+
 }
 
 

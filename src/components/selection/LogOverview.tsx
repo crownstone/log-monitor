@@ -42,7 +42,7 @@ function UserLogContainer(props) {
     open = true;
   }
   return (
-    <Grid container flexDirection={"column"}>
+    <Grid container flexDirection={"column"} style={{padding:10}}>
       <Grid item onClick={() => { if (open) { props.selectUser(null); } else { props.selectUser(props.userName); } }}>
         <Button variant="outlined" startIcon={open ? <ArrowDropDownIcon /> : <ArrowRightIcon />}>
           {props.userName}
