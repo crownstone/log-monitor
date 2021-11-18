@@ -16,7 +16,20 @@ export const FileUtil = {
     let result : {[userName: string] : any } = {}
     for (let userPath of items) {
       let user = path.basename(userPath)
-      result[user] = FileUtil.getDates(userPath)
+      let dates = FileUtil.getDates(userPath);
+      let processedFiles = FileUtil.getProcessedFiles(userPath);
+
+      let processedFileMap = {};
+      for (let processedFile of processedFiles) {
+        processedFileMap[processedFile] = true;
+      }
+
+      let content = [];
+      for (let date of dates) {
+        content.push({date: date, processed: processedFileMap[date] || false});
+      }
+
+      result[user] = content;
     }
     return result;
   },
@@ -55,6 +68,26 @@ export const FileUtil = {
       }
     }
     return result;
+  },
+
+
+  getProcessedFiles: function(inPath) : string[] {
+    let preprocessedPath = path.join(inPath, "processed");
+    let result : string[] = [];
+    if (FileUtil.fileExists(preprocessedPath)) {
+      let items = fs.readdirSync(preprocessedPath);
+      for (let item of items) {
+        if (item.indexOf("CrownstoneAppLog") !== -1) {
+          result.push(item.substr(16,10))
+        }
+      }
+    }
+    return result;
+  },
+
+  removeProcessedData(user,date) {
+    let filePath = path.join(USER_PATH, user, 'processed', `CrownstoneAppLog${date}.log`);
+    return fs.rmSync(filePath);
   },
 
   getFileContents(user, date) : string {

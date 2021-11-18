@@ -4,7 +4,7 @@ export class DataFlowManagerEvents extends DataFlowManagerBase {
 
   options: DataFlowOptions
 
-  constructor(options : ConstellationConfig = {}) {
+  constructor(options : DataFlowConfig = {}) {
     super();
     this.options = options?.dataflow ?? {};
   }

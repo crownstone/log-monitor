@@ -15,12 +15,14 @@ function getConstellationConfig() : ConstellationConfig {
   }
 }
 
-export class Constellation extends VisualizationBase {
+export class Constellation extends VisualizationBase<ConstellationConfig> {
 
-  config: ConstellationConfig = getConstellationConfig();
 
   constructor(props) {
     super(props, 'constellation')
+    if (this.config === undefined) {
+      this.config = getConstellationConfig();
+    }
   }
 
 

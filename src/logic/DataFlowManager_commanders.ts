@@ -11,7 +11,7 @@ export class CommanderDataFlowManager extends DataFlowManagerEvents {
   ]
 
   commanderType = null;
-  constructor(commanderType: string, options : ConstellationConfig = {}) {
+  constructor(commanderType: string, options : DataFlowConfig = {}) {
     super(options);
     this.commanderType = commanderType;
   }

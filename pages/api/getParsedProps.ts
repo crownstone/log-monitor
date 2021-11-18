@@ -12,10 +12,11 @@ export default async (req, res) => {
 
   if (req.body.type === 'cloud') {
     res.end(JSON.stringify({
-      cloud:     result.cloud,
-      reboots:   result.reboots,
-      startTime: result.startTime,
-      endTime:   result.endTime
+      cloud:         result.cloud,
+      reboots:       result.reboots,
+      localization:  result.localization,
+      startTime:     result.startTime,
+      endTime:       result.endTime
     }));
     return;
   }

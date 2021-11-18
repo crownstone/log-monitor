@@ -2,6 +2,7 @@ import * as vis from "vis-timeline/standalone/umd/vis-timeline-graph2d";
 
 export class DataFlowManagerBase {
 
+  groupOrder = null;
   priority : string[] = []
 
   itemThreshold = 1300;

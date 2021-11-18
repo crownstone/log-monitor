@@ -4,21 +4,20 @@ import {EventBusClass} from "../../util/EventBus";
 import {DataFlowTimeline} from "./DataFlowTimeline";
 import {CloudDataFlowManager} from "../../logic/DataFlowManager_cloud";
 
-export class CloudTimeline extends React.Component<{ data: ParseDataResult, eventBus: EventBusClass, cloudDataCallback: (d) => void }, { overlayContent: any | null }> {
+export class CloudTimeline extends React.Component<{ data: ParseDataResult, eventBus: EventBusClass, cloudDataCallback: (d) => void, config: CloudConfig }, { overlayContent: any | null }> {
 
   dataFlowTimeline: DataFlowTimeline;
   dataFlowManager: CloudDataFlowManager;
+  unsubscribe = [];
 
   constructor(props) {
     super(props);
     this.state = {overlayContent: null};
-    this.dataFlowManager = new CloudDataFlowManager();
+    this.dataFlowManager = new CloudDataFlowManager(this.props.config);
     this.dataFlowTimeline = new DataFlowTimeline(this.dataFlowManager, this.props.eventBus);
   }
 
-  componentDidMount() {
-    const { viscontainer } = this.refs;
-
+  refreshData() {
     console.time("PreparingData");
     this.dataFlowManager.load(this.props.data);
     console.timeEnd("PreparingData");
@@ -26,6 +25,12 @@ export class CloudTimeline extends React.Component<{ data: ParseDataResult, even
     console.time("GettingData");
     this.dataFlowManager.getAll();
     console.timeEnd("GettingData");
+  }
+
+  componentDidMount() {
+    const { viscontainer } = this.refs;
+
+    this.refreshData();
 
     // Configuration for the Timeline
     var options = {
@@ -40,11 +45,17 @@ export class CloudTimeline extends React.Component<{ data: ParseDataResult, even
         }
       }
     });
+
+    this.unsubscribe.push(this.props.eventBus.on("REFRESH_DATA", () => {
+      this.refreshData();
+      this.dataFlowTimeline.drawMarkers();
+    }));
   }
 
   componentWillUnmount() {
     this.dataFlowManager.destroy();
     this.dataFlowTimeline.destroy();
+    this.unsubscribe.forEach((unsub) => { unsub(); })
   }
 
 

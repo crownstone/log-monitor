@@ -1,7 +1,7 @@
 import React from "react";
 import {Backdrop, Paper} from "@mui/material";
 import {CommanderPhaseTimeline} from "./CommanderPhaseTimeline";
-import {EventBusClass, SharedEventBus} from "../../util/EventBus";
+import {EventBusClass} from "../../util/EventBus";
 import {DataFlowTimeline} from "./DataFlowTimeline";
 import {CommanderDataFlowManager} from "../../logic/DataFlowManager_commanders";
 

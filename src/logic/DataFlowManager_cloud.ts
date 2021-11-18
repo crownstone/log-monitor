@@ -55,7 +55,7 @@ export class CloudDataFlowManager extends DataFlowManagerEvents {
     }
     this.loadReboots(data);
     this.loadStartEndTimes(data);
-
+    this.loadLocalization(data);
 
     for (let key in this.rangeDataGroups) {
       this.rangeDataGroups[key].sort((a,b) => { return a.end - b.end})

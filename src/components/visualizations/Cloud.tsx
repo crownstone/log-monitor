@@ -14,14 +14,14 @@ function getCloudConfig() : CloudConfig {
   }
 }
 
-export class Cloud extends VisualizationBase {
-
-  config: CloudConfig = getCloudConfig();
-
+export class Cloud extends VisualizationBase<CloudConfig> {
   requestData = null
 
   constructor(props) {
     super(props, 'cloud');
+    if (this.config === undefined) {
+      this.config = getCloudConfig();
+    }
   }
 
   render() {
@@ -31,9 +31,9 @@ export class Cloud extends VisualizationBase {
           <CloudTimeline
             data={this.data}
             eventBus={this.eventBus}
+            config={this.config}
             cloudDataCallback={(data) => { this.requestData = data; this.forceUpdate() }}
           />
-
           <Backdrop open={this.state.showConfig} style={{zIndex:99999}} onClick={() => { this.setState({showConfig: false})}}>
             <Paper style={{maxHeight: '100vh', overflow:'auto', padding:20, width: '50vw'}} onClick={(event) => { event.stopPropagation() }}>
               <CloudSettings
@@ -90,13 +90,35 @@ function RequestDetails(props) {
 }
 
 
+
 function CloudSettings(props) {
+  let [sphereLevelLocalization, setSphereLevelLocalization] = useState(props.config.dataflow.showSphereLocalization);
+  let [roomLevelLocalization,   setRoomLevelLocalization]   = useState(props.config.dataflow.showRoomLocalization);
+
   return (
     <FormGroup>
       <h1>Cloud visualization settings</h1>
-      None yet.
+      <FormControlLabel control={
+        <Checkbox
+          onChange={() => { setSphereLevelLocalization(!sphereLevelLocalization)}}
+          checked={sphereLevelLocalization}
+        />}
+          label="Show sphere level localization"
+      />
+      <FormControlLabel control={
+        <Checkbox
+          onChange={() => { setRoomLevelLocalization(!roomLevelLocalization)}}
+          checked={roomLevelLocalization}
+        />}
+        label="Show room level localization"
+      />
       <Button
-        onClick={() => { props.close({ })}}
+        onClick={() => { props.close({
+          dataflow: {
+            showSphereLocalization: sphereLevelLocalization,
+            showRoomLocalization: roomLevelLocalization,
+          }
+        })}}
       >Save</Button>
     </FormGroup>
   )

@@ -6,6 +6,20 @@ type SessionType = "unconnected" | "connecting" | "connectingFailed" | "connecte
 
 export class SessionDataFlowManager extends DataFlowManagerEvents {
 
+  groupOrder = (a,b) => {
+    let aLocation = a.content.split(" in ")[1];
+    let bLocation = b.content.split(" in ")[1];
+    if (aLocation > bLocation) {
+      return 1;
+    }
+    else if (aLocation < bLocation) {
+      return -1;
+    }
+    else {
+      return a.content > b.content ? 1 : -1;
+    }
+  }
+
   itemThreshold = 1200;
   priority = [
     "ERROR",

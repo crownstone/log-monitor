@@ -4,13 +4,13 @@ import {GlobalStateKeeper} from "../../globalState/GlobalStateKeeper";
 import {Util} from "../../util/Util";
 
 
-export class VisualizationBase extends React.Component<
+export class VisualizationBase<T> extends React.Component<
   { user: string, date: string, any?},
   { loadedData: boolean, drawData: boolean, showConfig: boolean, showHelp: boolean, any? }
   >{
 
   eventBus : EventBusClass;
-  config: any
+  config: T
   data : ParseDataResult = {};
   unsubscribe = []
 
@@ -49,7 +49,9 @@ export class VisualizationBase extends React.Component<
   populateConfig() {
     let db = new GlobalStateKeeper();
     let storedConfig = db.get(`${this.type}Config`);
+    console.log('initial config', this.config)
     if (storedConfig) {
+      console.log("Loading stored config", `${this.type}Config`, storedConfig)
       this.config = storedConfig;
     }
   }
@@ -63,11 +65,16 @@ export class VisualizationBase extends React.Component<
         this.eventBus.emit("REFRESH_DATA");
       }
     }
+    else {
+      db.set(`${this.type}Config`, this.config);
+      this.eventBus.emit("REFRESH_DATA");
+    }
   }
 
 
   async init() {
     this.data = await Util.postData(`http://localhost:3000/api/getParsedProps`, {user: this.props.user, date: this.props.date, type:this.type});
+    SharedEventBus.emit("PARSED_DATA");
     this.setState({loadedData:true});
     setTimeout(() => { this.setState({drawData: true})}, 100);
   }

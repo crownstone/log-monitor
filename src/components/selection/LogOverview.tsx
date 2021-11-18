@@ -4,6 +4,7 @@ import React from "react";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { AnimatedGrid } from "../animating/AnimatedGrid";
+import {CloudOff} from "@mui/icons-material";
 
 export function LogOverview(props) {
   let items = [];
@@ -12,13 +13,14 @@ export function LogOverview(props) {
     items.push(<UserLogContainer
       key={user}
       userName={user}
-      dates={props.logs[user]}
+      logData={props.logs[user]}
 
       selectedUser={props.user}
       selectedDate={props.date}
 
       selectUser={props.selectUser}
       selectDate={props.selectDate}
+      removeProcessedData={props.removeProcessedData}
     />)
   }
 
@@ -41,6 +43,7 @@ function UserLogContainer(props) {
   if (props.selectedUser === props.userName) {
     open = true;
   }
+
   return (
     <Grid container flexDirection={"column"} style={{padding:10}}>
       <Grid item onClick={() => { if (open) { props.selectUser(null); } else { props.selectUser(props.userName); } }}>
@@ -48,11 +51,23 @@ function UserLogContainer(props) {
           {props.userName}
         </Button>
       </Grid>
-      { open && props.dates.map((date) => { return (
-        <Grid key={date} item onClick={() => { props.selectDate( date) }} ml={2}>
-          <Button variant="text" startIcon={<ArrowRightIcon />}>
-            {date}
-          </Button>
+      { open && props.logData.map((date: {date: string, processed: boolean}) => { return (
+        <Grid key={date.date} item ml={2}>
+          <Grid container flexDirection={"row"}>
+            <Grid item xl={6} onClick={() => { props.selectDate( date.date ) }} >
+              <Button variant="text" startIcon={<ArrowRightIcon />}>
+                {date.date}
+              </Button>
+            </Grid>
+
+          { date.processed &&
+              <Grid item xl={6} onClick={() => { props.removeProcessedData( date.date ) }} >
+                <Button variant="text" aria-label={"Remove cached data"}>
+                  <CloudOff />
+                </Button>
+              </Grid>
+          }
+          </Grid>
         </Grid>
       )
       })}

@@ -19,7 +19,9 @@ export class DataFlowTimeline {
   }
 
   create(container, options) {
-    this.timeline = new vis.Timeline(container, this.dataFlowManager.itemDataSet, this.dataFlowManager.groupDataSet, options);
+    let customSort =  (a,b) => { return a.content > b.content ? 1 : -1;}
+    let combinedOptions = {...options, groupOrder: this.dataFlowManager.groupOrder ?? customSort}
+    this.timeline = new vis.Timeline(container, this.dataFlowManager.itemDataSet, this.dataFlowManager.groupDataSet, combinedOptions);
 
     this.timeline.on('rangechange',(data) => {
       this.eventBus.emit("RANGE_CHANGED", data);

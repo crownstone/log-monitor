@@ -3,11 +3,14 @@ interface DataFlowOptions {
   showSphereLocalization?: boolean,
 }
 
-interface ConstellationConfig {
 
+
+interface DataFlowConfig {
   dataflow?: DataFlowOptions
 }
 
-interface CloudConfig {
+interface ConstellationConfig extends DataFlowConfig {
+}
 
+interface CloudConfig extends DataFlowConfig  {
 }
