@@ -5,7 +5,7 @@ import {FileUtil} from "../util/FileUtil";
 import {LocalizationParser} from "./app/LocalizationParser";
 import {CloudParser} from "./app/CloudParser";
 
-export function parseConsumerAppFileByLine(user, date, result, maxLines: number = 0, force=false) {
+export function parseConsumerAppFileByLine(user, date, result, maxLines: number = 0, force= false) {
   return new Promise<void>((resolve, reject) => {
     // use cached data.
     if (force === false) {

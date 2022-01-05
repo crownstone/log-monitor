@@ -96,21 +96,21 @@ export const SessionManagerPhases = {
 let fromJSON = (d) => { d = d.replace(/\\/g,''); return JSON.parse(d); };
 
 let sessionParsers : parserData[] = [
-  {type:'commander',     label:'created',           mapping: [{targets:(d) => { return d.replace(/"/,'').split(",")}},{commanderOptions: fromJSON}], regex:/Commander: Created for target",\[*([\w\-,"]*)\W*,"options:","({.*}*)"/},
-  {type:'commander',     label:'loadAction',        mapping: ['commandType','allowMeshRelays','commanderId'], regex:/Commander: Loading command\W*([\w-]*)\W*([\w]*),"id:","([\w-]*)/},
+  {type:'commander',     label:'created',           mapping: [{targets:(d) => { return d.replace(/"/,'').split(",")}},{commanderOptions: fromJSON}], regex:/Commander: Created for target\W*\[\W([\w\-,]*)[\W\]]*options: ({.*}*) /},
+  {type:'commander',     label:'loadAction',        mapping: ['commandType','allowMeshRelays','commanderId'], regex:/Commander: Loading command\W*([\w-]*)\W*([\w]*)\W*id:\W*([\w-]*)/},
   {type:'commander',     label:'failure',           mapping: ['errorMessage','commanderId'], regex:/Commander: Failed to load command\W*([\w]*)\W*id:\W*([\w-]*)/},
 
-  {type:'command',       label:CommandPhases.created,    mapping: [{command: fromJSON}],                                                   regex:/BleCommandManager: Loading command\W*({.*})"]/},
+  {type:'command',       label:CommandPhases.created,    mapping: [{command: fromJSON}],                                                   regex:/BleCommandManager: Loading command\W*({.*})/},
   {type:'command',       label:CommandPhases.performing, mapping: ['commandType', 'handle', 'commandId'],                                  regex:/BleCommandManager: Performing command\W*(\w*)\W*on\W*([\w-]*)\W*([\w-]*)/},
   {type:'command',       label:CommandPhases.succeeded,  mapping: ['commandType', 'handle', 'commandId'],                                  regex:/BleCommandManager: Succeeded command\W*(\w*)\W*on\W*([\w-]*)\W*([\w-]*)/},
-  {type:'command',       label:CommandPhases.failed,     mapping: ['commandType', 'handle', 'error', 'commandId'],                         regex:/BleCommandManager: Something went wrong while performing\W*(\w*)\W*([\w-]*)\W*(.*)",\W*([\w-]*)/},
+  {type:'command',       label:CommandPhases.failed,     mapping: ['commandType', 'handle', 'error', 'commandId'],                         regex:/BleCommandManager: Something went wrong while performing\W*(\w*)\W*([\w-]*)\W*(.*)\W*([\w-]*)/},
   {type:'command',       label:CommandPhases.duplicate,  mapping: ['commandId', 'removedByCommandId', 'commandType','commandTargetType', 'commanderId'], regex:/BleCommandCleaner: Removed command due to duplicate\W*([\w-]*)\W*([\w-]*)\W*([\w-]*)\W*([\w-]*)\W*([\w-]*)/},
-  {type:'command',       label:CommandPhases.loadingBroadcast,    mapping: [{command: fromJSON}], regex:/BroadcastCommandManager: Loading command for broadcast\W*({.*})"]/},
+  {type:'command',       label:CommandPhases.loadingBroadcast,    mapping: [{command: fromJSON}], regex:/BroadcastCommandManager: Loading command for broadcast\W*({.*})/},
   {type:'command',       label:CommandPhases.broadcastDelayed,    mapping: ['commandType','commandId'], regex:/BroadcastCommandManager: Scheduling broadcast for later\W*([\w]*)\W*([\w-]*)/},
   {type:'command',       label:CommandPhases.broadcastDuplicate,  mapping: ['commandType','commandId'], regex:/BroadcastCommandManager: Remove item from duplicate queue[\W\d]*(\w*)\W*([\w-]*)/},
   {type:'command',       label:CommandPhases.broadcastStart,      mapping: ['commandType','commandId'], regex:/BroadcastCommandManager: broadcasting\W*(\w*)\W*([\w-]*)/},
   {type:'command',       label:CommandPhases.broadcastSuccess,    mapping: ['commandType','commandId'], regex:/BroadcastCommandManager: Successfully broadcast\W*(\w*)\W*([\w-]*)/},
-  {type:'command',       label:CommandPhases.broadcastError,      mapping: ['commandType','commandId','error'], regex:/BroadcastCommandManager: Error broadcasting\W*(\w*)\W*([\w-]*)[\W]*([\w]*)"\]/},
+  {type:'command',       label:CommandPhases.broadcastError,      mapping: ['commandType','commandId','error'], regex:/BroadcastCommandManager: Error broadcasting\W*(\w*)\W*([\w-]*)[\W]*([\w]*)/},
 
   {type:'sessionBroker', label: SessionBrokerPhases.requesting,       mapping: ["handle", "commanderId", "privateRequest", "commandType"], regex:/SessionBroker: actually requesting session\W*"([\w-]*)"\W*for\W*([\w-]*).*private\W*(\w*)\W*commandType\W*([\w-]*)/},
   {type:'sessionBroker', label: SessionBrokerPhases.connected,        mapping: ["handle", "commanderId"], regex:/SessionBroker: Session has connected to\W*([\w-]*)\W*for\W*([\w-]*)/,   },
@@ -127,7 +127,7 @@ let sessionParsers : parserData[] = [
   {type:'session', label: SessionPhases.created,              mapping:['handle','sessionId'],    regex:/Session: Creating session\W*([\w-]*)\W*([\w-]*)/},
   {type:'session', label: SessionPhases.connecting,           mapping:['handle','sessionId'],    regex:/Session: Start connecting to\W*([\w-]*)\W*([\w-]*)/},
   {type:'session', label: SessionPhases.connected,            mapping:['handle','sessionId'],    regex:/Session: Connected to\W*([\w-]*)\W*([\w-]*)/},
-  {type:'session', label: SessionPhases.connectingFailed,     mapping:['error','handle','sessionId','killedFlag'],  regex:/Session: Failed to connect\W*([^,]*)","([\w-]*)\W*([\w-]*)\W*([\w-]*)/},
+  {type:'session', label: SessionPhases.connectingFailed,     mapping:['error','handle','sessionId','killedFlag'],  regex:/Session: Failed to connect\W*([^,^ ]*) ([\w-]*) ([\w-]*) ([\w-]*)/},
   {type:'session', label: SessionPhases.retryConnection,      mapping:['handle','sessionId'],    regex:/Session: Reinitializing the bootstrapper to reactivate the session\W*([\w-]*)\W*([\w-]*)/},
   {type:'session', label: SessionPhases.performCommand,       mapping:['commandId', 'handle','sessionId'],    regex:/Session: performing available command\W*([\w-]*)\W*([\w-]*)\W*([\w-]*)/},
   {type:'session', label: SessionPhases.performedCommand,     mapping:['commandId', 'handle','sessionId'],    regex:/Session: Finished available command\W*([\w-]*)\W*([\w-]*)\W*([\w-]*)/},

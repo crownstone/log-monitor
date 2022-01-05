@@ -1,6 +1,6 @@
 import {BaseParser} from "./BaseParser";
 
-let nameMap = /MapProvider: nameMap\W*({.*)"\]/
+let nameMap = /MapProvider: nameMap\W*({.*)/
 
 export class NameMapParser extends BaseParser {
 

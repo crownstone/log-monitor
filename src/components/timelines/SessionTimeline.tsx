@@ -31,7 +31,7 @@ export class SessionTimeline extends React.Component<{ data: ParseDataResult, ev
 
     // Configuration for the Timeline
     var options = {
-      stack: false
+      stack: false,
     };
 
     this.dataFlowTimeline.create(viscontainer, options)

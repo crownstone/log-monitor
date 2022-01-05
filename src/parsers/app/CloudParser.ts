@@ -5,11 +5,11 @@ let fromJSON = (d) => {
 };
 
 let cloudParsers : parserData[] = [
-  {type:'sync', label:'syncStart', mapping:[], regex:/Sync: Start Syncing./},
-  {type:'sync', label:'syncFailed', mapping:[], regex:/Sync: Failed/},
-  {type:'sync', label:'syncEnd',  mapping:[], regex:/Sync: Finished. Dispatching/},
-  {type:'cloud', label:'request', mapping:['method', 'url', {config: fromJSON}, 'id'],            regex:/(\w*)\W*requesting from URL:\W*(.*)","config\W*({.*})\W*(\w*)/},
-  {type:'cloud', label:'reply',   mapping:['url', {config: fromJSON}, {result: fromJSON}, 'id'], regex:/REPLY from\W*(.*)"," with options\W*({.*})\W*" is: "\W*({.*})\W*([\w*]*)/}
+  {type:'sync',  label:'syncStart',  mapping:[], regex:/Sync: Start Syncing./},
+  {type:'sync',  label:'syncFailed', mapping:[], regex:/Sync: Failed/},
+  {type:'sync',  label:'syncEnd',    mapping:[], regex:/Sync: Finished. Dispatching/},
+  {type:'cloud', label:'request',    mapping:['method', 'url', {config: fromJSON}, 'id'], regex:/(\w*)\W*requesting from URL:\W*(.*)config\W*({.*})\W*(\w*)/},
+  {type:'cloud', label:'reply',      mapping:['url', {result: fromJSON}, 'id'], regex:/REPLY from\W*(.*) is: \W*({.*})\W*([\w*]*)/}
 ]
 
 
