@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React from "react";
 import {EventBusClass, SharedEventBus} from "../../util/EventBus";
 import {GlobalStateKeeper} from "../../globalState/GlobalStateKeeper";
 import {Util} from "../../util/Util";

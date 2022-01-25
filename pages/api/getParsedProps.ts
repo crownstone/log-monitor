@@ -31,6 +31,17 @@ export default async (req, res) => {
     }));
     return;
   }
+  if (req.body.type === 'notifications') {
+    res.end(JSON.stringify({
+      reboots:       result.reboots,
+      notifications: result.notifications,
+      nameMap:       result.nameMap,
+      localization:  result.localization,
+      startTime:     result.startTime,
+      endTime:       result.endTime
+    }));
+    return;
+  }
 
 }
 

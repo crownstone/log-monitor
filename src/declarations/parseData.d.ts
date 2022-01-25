@@ -7,6 +7,7 @@ interface ParseDataResult {
   nameMap?:       NameMap,
   localization?:  LocalizationParseResult,
   cloud?:         CloudParseResult,
+  notifications?: NotificationsParseResult,
 
   startTime?: number,
   endTime?:   number,

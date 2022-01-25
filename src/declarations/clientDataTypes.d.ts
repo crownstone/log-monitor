@@ -14,3 +14,6 @@ interface ConstellationConfig extends DataFlowConfig {
 
 interface CloudConfig extends DataFlowConfig  {
 }
+
+interface NotificationConfig extends DataFlowConfig  {
+}

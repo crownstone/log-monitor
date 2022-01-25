@@ -4,6 +4,7 @@ import {NameMapParser} from "./app/NameMapParser";
 import {FileUtil} from "../util/FileUtil";
 import {LocalizationParser} from "./app/LocalizationParser";
 import {CloudParser} from "./app/CloudParser";
+import {NotificationParser} from "./app/NotificationParser";
 
 
 export function getLineCount(path) {
@@ -59,6 +60,7 @@ export function parseConsumerAppFileByLine(user, date, result, part: number = nu
 
     let parsers = [
       new NameMapParser(result),
+      new NotificationParser(result),
       new RebootParser(result),
       new ConstellationParser(result),
       new LocalizationParser(result),

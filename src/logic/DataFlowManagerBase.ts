@@ -8,13 +8,13 @@ export class DataFlowManagerBase {
   itemThreshold = 1300;
 
   eventDataGroups : {[typeId: number]: any[]}  = {}
-  rangeDataGroups : {[typeId: number] : any[]} = {}
+  rangeDataGroups : {[typeId: number]: any[]} = {}
 
   itemDataSet:  vis.DataSet;
   groupDataSet: vis.DataSet;
 
-  startTime = Infinity;
-  endTime = -Infinity;
+  startTime = -Infinity;
+  endTime = Infinity;
 
   getTimeout = null;
 
