@@ -5,7 +5,7 @@ import {Util} from "../../util/Util";
 
 
 export class VisualizationBase<T> extends React.Component<
-  { user: string, date: string, any?},
+  { user: string, date: string, part?: number, any?, parts?: number},
   { loadedData: boolean, drawData: boolean, showConfig: boolean, showHelp: boolean, any? }
   >{
 
@@ -73,7 +73,13 @@ export class VisualizationBase<T> extends React.Component<
 
 
   async init() {
-    this.data = await Util.postData(`http://localhost:3000/api/getParsedProps`, {user: this.props.user, date: this.props.date, type:this.type});
+    this.data = await Util.postData(`http://localhost:3000/api/getParsedProps`, {
+      user:  this.props.user,
+      date:  this.props.date,
+      type:  this.type,
+      part:  this.props.part,
+      parts: this.props.parts,
+    });
     SharedEventBus.emit("PARSED_DATA");
     this.setState({loadedData:true});
     setTimeout(() => { this.setState({drawData: true})}, 100);

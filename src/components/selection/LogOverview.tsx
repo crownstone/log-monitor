@@ -19,7 +19,7 @@ export function LogOverview(props) {
       selectedDate={props.date}
 
       selectUser={props.selectUser}
-      selectDate={props.selectDate}
+      selectItem={props.selectItem}
       removeProcessedData={props.removeProcessedData}
     />)
   }
@@ -44,6 +44,7 @@ function UserLogContainer(props) {
     open = true;
   }
 
+
   return (
     <Grid container flexDirection={"column"} style={{padding:10}}>
       <Grid item onClick={() => { if (open) { props.selectUser(null); } else { props.selectUser(props.userName); } }}>
@@ -51,17 +52,22 @@ function UserLogContainer(props) {
           {props.userName}
         </Button>
       </Grid>
-      { open && props.logData.map((date: {date: string, processed: boolean}) => { return (
-        <Grid key={date.date} item ml={2}>
+      { open && props.logData.map((itemData: {date: string, processed: boolean, size: number, part? : number, parts?: number}) => {
+        let label = `${itemData.date} (${itemData.size} MB)`;
+        if (itemData.part !== undefined) {
+          label += ` part ${itemData.part + 1}`
+        }
+        return (
+        <Grid container key={itemData.date + itemData.part} item ml={2}>
           <Grid container flexDirection={"row"}>
-            <Grid item xl={6} onClick={() => { props.selectDate( date.date ) }} >
+            <Grid item xl={5} onClick={() => { props.selectItem( itemData.date, itemData.part, itemData.parts ) }} >
               <Button variant="text" startIcon={<ArrowRightIcon />}>
-                {date.date}
+                {label}
               </Button>
             </Grid>
 
-          { date.processed &&
-              <Grid item xl={6} onClick={() => { props.removeProcessedData( date.date ) }} >
+          { itemData.processed &&
+              <Grid item xl={7} onClick={() => { props.removeProcessedData( itemData.date ) }} >
                 <Button variant="text" aria-label={"Remove cached data"}>
                   <CloudOff />
                 </Button>
@@ -69,7 +75,7 @@ function UserLogContainer(props) {
           }
           </Grid>
         </Grid>
-      )
+      ) 
       })}
     </Grid>
   )

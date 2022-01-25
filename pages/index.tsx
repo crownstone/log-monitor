@@ -31,6 +31,8 @@ export default class FileOverview extends React.Component<any, any> {
       selectedUser: null,
       selectedDate: null,
       selectedType: null,
+      selectedPart: null,
+      totalParts: null,
       logs: params.logs
     }
   }
@@ -40,6 +42,8 @@ export default class FileOverview extends React.Component<any, any> {
     this.setState({
       selectedUser: this.db.get('selectedUser'),
       selectedDate: this.db.get('selectedDate'),
+      selectedPart: this.db.get('selectedPart'),
+      totalParts: this.db.get('totalParts'),
       selectedType: this.db.get('selectedType'),
     })
     this.unsubscribe.push(SharedEventBus.on("PARSED_DATA", () => { this.updateLogData(); }));
@@ -72,9 +76,11 @@ export default class FileOverview extends React.Component<any, any> {
       <ThemeProvider theme={GuardianTheme}>
         <Grid container flexDirection={'row'} style={{backgroundColor: colors.white.hex}}>
           <SideBar
-            selectDate={(data) => {
-              this.setState({selectedDate:data, selectedType: null, showSettings: false, showHelp: false});
+            selectDate={(data, part, totalParts) => {
+              this.setState({selectedDate:data, selectedPart: part, totalParts: totalParts, showSettings: false, showHelp: false});
               this.db.set('selectedDate', data);
+              this.db.set('selectedPart', part);
+              this.db.set('totalParts', totalParts);
               this.db.remove('selectedType');
             }}
             selectType={(data) => {this.setState({selectedType:data, showSettings: false, showHelp: false}); this.db.set('selectedType', data)}}
@@ -91,7 +97,12 @@ export default class FileOverview extends React.Component<any, any> {
             user={this.state.selectedUser}
             date={this.state.selectedDate}
             selectUser={(data) => {this.setState({selectedUser:data, showSettings: false, showHelp: false}); this.db.set('selectedUser', data)}}
-            selectDate={(data) => {this.setState({selectedDate:data, showSettings: false, showHelp: false}); this.db.set('selectedDate', data)}}
+            selectItem={(data, part, totalParts) => {
+              this.setState({selectedDate:data, selectedPart: part, totalParts: totalParts, showSettings: false, showHelp: false});
+              this.db.set('selectedDate', data);
+              this.db.set('selectedPart', part);
+              this.db.set('totalParts', totalParts);
+            }}
             removeProcessedData={async (date) => {
               await this.removeProcessedLogData(this.state.selectedUser, date);
               await this.updateLogData();
@@ -108,6 +119,8 @@ export default class FileOverview extends React.Component<any, any> {
               user={this.state.selectedUser}
               date={this.state.selectedDate}
               type={this.state.selectedType}
+              part={this.state.selectedPart}
+              parts={this.state.totalParts}
             />
           }
         </Grid>

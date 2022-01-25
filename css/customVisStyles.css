@@ -56,7 +56,9 @@
 }
 
 .vis-panel.vis-left.vis-inner {
-    width: 300px;
+    width: 350px;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .vis-custom-time {

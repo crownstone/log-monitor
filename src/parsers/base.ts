@@ -5,11 +5,30 @@ import {FileUtil} from "../util/FileUtil";
 import {LocalizationParser} from "./app/LocalizationParser";
 import {CloudParser} from "./app/CloudParser";
 
-export function parseConsumerAppFileByLine(user, date, result, maxLines: number = 0, force= false) {
-  return new Promise<void>((resolve, reject) => {
+
+export function getLineCount(path) {
+  return new Promise<number>((resolve, reject) => {
+    const file = FileUtil.getFileStream(path)
+
+    // use cached data.
+    let count = 0
+    file.on('line', (line) => {
+      count++;
+    });
+
+    file.on("close", () => {
+      resolve(count);
+    })
+
+  })
+}
+
+
+export function parseConsumerAppFileByLine(user, date, result, part: number = null, parts: number = null, force= false) {
+  return new Promise<void>(async (resolve, reject) => {
     // use cached data.
     if (force === false) {
-      let processedData = FileUtil.getProcessedData(user, date);
+      let processedData = FileUtil.getProcessedData(user, date, part);
       if (processedData) {
         console.log("USING CACHE")
         // shallow copy into result
@@ -21,12 +40,27 @@ export function parseConsumerAppFileByLine(user, date, result, maxLines: number 
       }
     }
 
-    const file = FileUtil.getFileStream(user, date)
+    let startLine = 0;
+    let endLine = 0;
+
+    let filePath = FileUtil.getFilePath(user,date);
+    if (part !== null) {
+      let amountOfLines = await getLineCount(filePath)
+      console.log("total line count =", amountOfLines)
+
+      let linesPerChunk = Math.ceil(amountOfLines / parts);
+
+      startLine = linesPerChunk*part;
+      endLine = startLine + linesPerChunk;
+
+    }
+
+    const file = FileUtil.getFileStream(filePath);
 
     let parsers = [
+      new NameMapParser(result),
       new RebootParser(result),
       new ConstellationParser(result),
-      new NameMapParser(result),
       new LocalizationParser(result),
       new CloudParser(result),
     ]
@@ -36,13 +70,21 @@ export function parseConsumerAppFileByLine(user, date, result, maxLines: number 
     file.on('line', (line) => {
       if (!line) return;
 
-      if (total++ > maxLines && maxLines > 0) {
+      total++;
+      let item = [Number(line.substr(0,13)), line];
+
+      if (startLine > total) {
+        parsers[0].load(item);
         return;
       }
 
-      let item = [Number(line.substr(0,13)), line];
+      if (total > endLine && endLine > 0) {
+        parsers[0].load(item);
+        return;
+      }
 
-      if (firstTime === null) { firstTime = item[0]}
+
+      if (firstTime === null) { firstTime = item[0] }
 
       for (let parser of parsers) {
         parser.load(item);
@@ -61,7 +103,7 @@ export function parseConsumerAppFileByLine(user, date, result, maxLines: number 
       result.startTime = firstTime;
       result.endTime   = lastTime;
       console.log("Parsing Done", user, date)
-      FileUtil.storeProcessedData(user, date, result);
+      FileUtil.storeProcessedData(user, date, result, part);
       resolve();
     })
 

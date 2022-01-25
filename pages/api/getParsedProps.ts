@@ -5,9 +5,8 @@ import {parseConsumerAppFileByLine} from "../../src/parsers/base";
 export default async (req, res) => {
   console.time("Parsing")
   let result : ParseDataResult = {};
-  await parseConsumerAppFileByLine(req.body.user, req.body.date, result);
+  await parseConsumerAppFileByLine(req.body.user, req.body.date, result, req.body.part ?? null, req.body.parts ?? null);
   console.timeEnd("Parsing")
-
 
 
   if (req.body.type === 'cloud') {
