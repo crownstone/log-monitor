@@ -1,22 +1,53 @@
-
 type RebootData = [number, number];
 
 interface ParseDataResult {
-  reboots?:       RebootData[],
-  constellation?: ConstellationParseResult,
-  nameMap?:       NameMap,
-  localization?:  LocalizationParseResult,
-  cloud?:         CloudParseResult,
-  notifications?: NotificationsParseResult,
+  reboots?:         RebootData[],
+  constellation?:   ConstellationParseResult,
+  nameMap?:         NameMap,
+  localization?:    LocalizationParseResult,
+  cloud?:           CloudParseResult,
+  notifications?:   NotificationsParseResult,
+  bluenetPromises?: BluenetPromisesParseResult,
 
   startTime?: number,
   endTime?:   number,
+}
+
+
+interface BluenetPromisesParseResult {
+  promises: {
+    id:      string
+    tStart:  number,
+    tEnd:    number,
+    command: string,
+    success: boolean,
+    error:   string,
+    params:  any[],
+    result:  string,
+    appStateStart: parseResult.appState,
+    appStateEnd: null,
+  }[],
+  count: {
+    value: number,
+    t: number
+  }[]
+}
+
+interface NotificationsParseResult {
+  notifications: {
+    [type: string]: {
+      id:      string,
+      t:       number,
+      content: any
+    }[]
+  }
 }
 
 interface CloudParseResult {
   requests: CloudRequest,
   syncs: {tStart: number, tEnd: number, error?: boolean}[]
 }
+
 interface CloudRequest {
   tStart: number,
   tEnd: number,
@@ -29,8 +60,9 @@ interface LocalizationParseResult {
   locations: {time: number, label: string, data: {locationId: string, sphereId: string}}[],
 }
 
-type stoneAppId = string;
+type stoneAppId    = string;
 type locationAppId = string;
+
 interface NameMap {
   sphereIdMap:    {[sphereAppId:   string] : {name: string, cloudId: string, uid: number,  uuid: string}}
   locationIdMap:  {[locationAppId: string] : {name: string, cloudId: string, uid: number}}

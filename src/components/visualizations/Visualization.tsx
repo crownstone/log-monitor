@@ -1,7 +1,8 @@
 import React from "react";
-import {Constellation} from "./Constellation";
-import {Cloud} from "./Cloud";
-import {Notifications} from "./Notifications";
+import {Constellation}   from "./Constellation";
+import {Cloud}           from "./Cloud";
+import {Notifications}   from "./Notifications";
+import {BluenetPromises} from "./BluenetPromises";
 
 export function Visualization({user, date, type, part, parts}) {
   switch (type) {
@@ -11,6 +12,8 @@ export function Visualization({user, date, type, part, parts}) {
       return <Cloud user={user} date={date} part={part} parts={parts} />
     case "Notifications":
       return <Notifications user={user} date={date} part={part} parts={parts} />
+    case "BluenetPromises":
+      return <BluenetPromises user={user} date={date} part={part} parts={parts} />
     default:
       return <div>Not implemented yet..</div>
   }

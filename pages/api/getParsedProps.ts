@@ -31,6 +31,7 @@ export default async (req, res) => {
     }));
     return;
   }
+
   if (req.body.type === 'notifications') {
     res.end(JSON.stringify({
       reboots:       result.reboots,
@@ -39,6 +40,18 @@ export default async (req, res) => {
       localization:  result.localization,
       startTime:     result.startTime,
       endTime:       result.endTime
+    }));
+    return;
+  }
+
+  if (req.body.type === 'bluenetPromises') {
+    res.end(JSON.stringify({
+      reboots:         result.reboots,
+      bluenetPromises: result.bluenetPromises,
+      nameMap:         result.nameMap,
+      localization:    result.localization,
+      startTime:       result.startTime,
+      endTime:         result.endTime
     }));
     return;
   }

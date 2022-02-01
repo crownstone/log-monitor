@@ -31,6 +31,9 @@ export function TypeOverview(props) {
         <Button onClick={() => { props.select('Notifications')}}>Notifications</Button>
       </Grid>
       <Grid item ml={2}>
+        <Button onClick={() => { props.select('BluenetPromises')}}>BluenetPromises</Button>
+      </Grid>
+      <Grid item ml={2}>
         <Button onClick={() => { props.select('Connections')}}>Connections</Button>
       </Grid>
     </Grid>

@@ -17,3 +17,11 @@ interface CloudConfig extends DataFlowConfig  {
 
 interface NotificationConfig extends DataFlowConfig  {
 }
+
+interface BluenetPromiseConfig extends DataFlowConfig  {
+  dataflow?: {
+    showRoomLocalization?:    boolean,
+    showSphereLocalization?:  boolean,
+    showCancelledConnections: boolean
+  }
+}

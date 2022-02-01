@@ -64,3 +64,14 @@
 .vis-custom-time {
     pointer-events: none;
 }
+
+.vis-item.success {
+    background-color: #b1eb76;
+    border-width:1px;
+    border-color: #9dd169;
+}
+.vis-item.error {
+    background-color: #eea23b;
+    border-width:1px;
+    border-color: #d48435;
+}

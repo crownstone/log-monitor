@@ -5,6 +5,7 @@ import {FileUtil} from "../util/FileUtil";
 import {LocalizationParser} from "./app/LocalizationParser";
 import {CloudParser} from "./app/CloudParser";
 import {NotificationParser} from "./app/NotificationParser";
+import {BluenetPromiseParser} from "./app/BluenetPromiseParser";
 
 
 export function getLineCount(path) {
@@ -62,10 +63,11 @@ export function parseConsumerAppFileByLine(user, date, result, part: number = nu
       new NameMapParser(result),
       new NotificationParser(result),
       new RebootParser(result),
+      new BluenetPromiseParser(result),
       new ConstellationParser(result),
       new LocalizationParser(result),
       new CloudParser(result),
-    ]
+    ];
     let total = 0;
     let firstTime = null;
     let lastTime = null;

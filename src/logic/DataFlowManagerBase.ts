@@ -7,7 +7,8 @@ export class DataFlowManagerBase {
 
   itemThreshold = 1300;
 
-  eventDataGroups : {[typeId: number]: any[]}  = {}
+  eventDataGroups : {[typeId: number]: any[]} = {}
+  graphDataGroups : {[typeId: number]: any[]} = {}
   rangeDataGroups : {[typeId: number]: any[]} = {}
 
   itemDataSet:  vis.DataSet;
@@ -91,8 +92,31 @@ export class DataFlowManagerBase {
         items = items.concat(itemCandidates);
       }
     }
-    this.itemDataSet.add(items);
 
+    for (let type of this.priority) {
+      let typeData = this.graphDataGroups[type];
+      let itemCandidates = []
+      if (typeData) {
+        for (let datapoint of typeData) {
+          // end in between
+          if (datapoint.x >= start && datapoint.x <= end) {
+            itemCount++;
+            itemCandidates.push(datapoint);
+            endTime = Math.max(datapoint.x, endTime);
+          }
+
+          if (itemCount >= this.itemThreshold) {
+            aborted = true;
+            break;
+          }
+        }
+      }
+      if (!aborted || items.length == 0) {
+        items = items.concat(itemCandidates);
+      }
+    }
+
+    this.itemDataSet.add(items);
     this.breakTime = endTime;
     if (!aborted || this.breakTime === end) {
       this.breakTime = null;
