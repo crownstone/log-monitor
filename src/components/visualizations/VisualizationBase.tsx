@@ -5,7 +5,7 @@ import {Util} from "../../util/Util";
 
 
 export class VisualizationBase<T> extends React.Component<
-  { user: string, date: string, part?: number, any?, parts?: number},
+  { user?: string, date?: string, part?: number, any?, parts?: number, path?: string},
   { loadedData: boolean, drawData: boolean, showConfig: boolean, showHelp: boolean, any? }
   >{
 
@@ -74,6 +74,7 @@ export class VisualizationBase<T> extends React.Component<
 
   async init() {
     this.data = await Util.postData(`http://localhost:3000/api/getParsedProps`, {
+      path:  this.props.path,
       user:  this.props.user,
       date:  this.props.date,
       type:  this.type,

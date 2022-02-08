@@ -20,7 +20,14 @@ export const getStaticProps: GetStaticProps = async (context) => {
   }
 }
 
-export default class FileOverview extends React.Component<any, any> {
+export default class FileOverview extends React.Component<any, {
+  selectedUser: any,
+  selectedDate: any,
+  selectedType: any,
+  selectedPart: any,
+  totalParts: any,
+  logs: any
+}> {
 
   db : GlobalStateKeeper;
   unsubscribe = [];
@@ -76,14 +83,14 @@ export default class FileOverview extends React.Component<any, any> {
       <ThemeProvider theme={GuardianTheme}>
         <Grid container flexDirection={'row'} style={{backgroundColor: colors.white.hex}}>
           <SideBar
-            selectDate={(data, part, totalParts) => {
-              this.setState({selectedDate:data, selectedPart: part, totalParts: totalParts, showSettings: false, showHelp: false});
-              this.db.set('selectedDate', data);
-              this.db.set('selectedPart', part);
-              this.db.set('totalParts', totalParts);
+            clearFileData={() => {
+              this.setState({selectedDate: null, selectedPart: null, totalParts: null});
+              this.db.set('selectedDate', null);
+              this.db.set('selectedPart', null);
+              this.db.set('totalParts', null);
               this.db.remove('selectedType');
             }}
-            selectType={(data) => {this.setState({selectedType:data, showSettings: false, showHelp: false}); this.db.set('selectedType', data)}}
+            clearTypeData={(data) => {this.setState({selectedType:data}); this.db.set('selectedType', data)}}
             viz={{
               settings: () => { SharedEventBus.emit("SHOW_SETTINGS"); },
               help:     () => { SharedEventBus.emit("SHOW_HELP"); },
@@ -96,9 +103,9 @@ export default class FileOverview extends React.Component<any, any> {
             logs={this.state.logs}
             user={this.state.selectedUser}
             date={this.state.selectedDate}
-            selectUser={(data) => {this.setState({selectedUser:data, showSettings: false, showHelp: false}); this.db.set('selectedUser', data)}}
+            selectUser={(data) => {this.setState({selectedUser:data}); this.db.set('selectedUser', data)}}
             selectItem={(data, part, totalParts) => {
-              this.setState({selectedDate:data, selectedPart: part, totalParts: totalParts, showSettings: false, showHelp: false});
+              this.setState({selectedDate:data, selectedPart: part, totalParts: totalParts});
               this.db.set('selectedDate', data);
               this.db.set('selectedPart', part);
               this.db.set('totalParts', totalParts);
@@ -110,7 +117,7 @@ export default class FileOverview extends React.Component<any, any> {
           />
 
           <TypeContainer
-            select={(type) => { this.setState({selectedType: type, showSettings: false, showHelp: false}); this.db.set('selectedType', type)}}
+            select={(type) => { this.setState({selectedType: type}); this.db.set('selectedType', type)}}
             phase={phase}
           />
 

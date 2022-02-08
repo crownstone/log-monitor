@@ -29,15 +29,17 @@ export class CommanderPhaseTimeline extends React.Component<{ data: ParseDataRes
     let groups = {};
     groups[COMMANDER_GROUP] = {id:COMMANDER_GROUP, content:"Commander", style:'width: 300px'};
 
-    let sessionBrokerItems = {}
-    let commanderSingularEvents = {}
+    let sessionBrokerItems = {};
+    let commanderSingularEvents = {};
     for (let phase of phases) {
      let handle = phase?.data?.handle ?? null;
       if (handle) {
         let groupName = getGroupName(nameMap, handle);
         groups[groupName] = {id: groupName, content: groupName, style:'width: 300px'};
         // items.push({start: new Date(phase.time), content: phase.label, group: groupName});
-
+        if (groupName.substr(0,2) === '64') {
+          console.log(phase)
+        }
         if (sessionBrokerItems[handle] === undefined) {
           sessionBrokerItems[handle] = {startT: Infinity, endT: -Infinity, properties: {}, phases:[], group: groupName};
         }
@@ -82,6 +84,7 @@ export class CommanderPhaseTimeline extends React.Component<{ data: ParseDataRes
           content:"SESSION_REVOKE"
         }
       }
+
       if (handleData.properties[CommandPhases.performing]) {
         className = "performingCommand";
       }

@@ -63,7 +63,7 @@ export class CommanderDataFlowManager extends DataFlowManagerEvents {
         if (!this.rangeDataGroups[this.commanderType]) {
           this.rangeDataGroups[this.commanderType] = [];
         }
-
+        console.log(commanderId, commander)
         this.rangeDataGroups[this.commanderType].push({
           id:      commanderId,
           start:   commander.tStart,

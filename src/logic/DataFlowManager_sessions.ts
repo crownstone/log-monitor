@@ -72,7 +72,9 @@ export class SessionDataFlowManager extends DataFlowManagerEvents {
         }
 
         this.rangeDataGroups[type].push({id: sessionId, start: session.tStart, end: session.tEnd, group: groupName, className: type});
-
+        if (sessionId == 'd8efabd8-aea7') {
+          console.log(session)
+        }
         this.startTime = Math.min(this.startTime, session.tStart);
         this.endTime = Math.max(this.endTime, session.tEnd);
       }

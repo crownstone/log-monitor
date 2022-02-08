@@ -15,16 +15,16 @@ beforeAll(async () => {})
 afterEach(async () => { })
 afterAll(async () => {})
 
-test("experiment", async () => {
-  let result : any = {};
-  console.time("parseStart")
-  await parseConsumerAppFileByLine('Alex', '2021-10-28', result);
-  console.timeEnd("parseStart")
-  let commanders = result.constellation.sessions;
-  for (let commanderId in commanders) {
-    console.log(commanders[commanderId].phases)
-  }
-})
+// test("experiment", async () => {
+  // let result : any = {};
+  // console.time("parseStart")
+  // await parseConsumerAppFileByLine('Alex', '2021-10-28', result);
+  // console.timeEnd("parseStart")
+  // let commanders = result.constellation.sessions;
+  // for (let commanderId in commanders) {
+  //   console.log(commanders[commanderId].phases)
+  // }
+// })
 
 test("Check Constellation Regex correctness", async () => {
   let exportData = {};

@@ -1,9 +1,5 @@
-import {BaseParser} from "./BaseParser";
+import {BaseParser, fromJSON} from "./BaseParser";
 import {Util} from "../../util/Util";
-
-let fromJSON = (d) => {
-  return JSON.parse(d);
-};
 
 let notificationParsers : parserData[] = [
   {type:'notification',  label:'notification_received',  mapping:[{notification:fromJSON}], regex:/NotificationHandler: Received notification\W*({.*})/},

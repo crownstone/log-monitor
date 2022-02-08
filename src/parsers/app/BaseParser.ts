@@ -1,3 +1,13 @@
+export const fromJSON = (d) => {
+  d = d.replace(/\\/g,'');
+  try {
+    return JSON.parse(d);
+  }
+  catch (err) {
+    console.log("COULD NOT PARSE", d, err);
+    throw err
+  }
+};
 
 
 export class BaseParser {

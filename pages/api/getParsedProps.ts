@@ -1,11 +1,18 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 
-import {parseConsumerAppFileByLine} from "../../src/parsers/base";
+import {parseConsumerAppFileByLine, parseCustomFileByLine} from "../../src/parsers/base";
 
 export default async (req, res) => {
   console.time("Parsing")
   let result : ParseDataResult = {};
-  await parseConsumerAppFileByLine(req.body.user, req.body.date, result, req.body.part ?? null, req.body.parts ?? null);
+
+  if (req.body.path) {
+    await parseCustomFileByLine(req.body.path, result);
+  }
+  else {
+    await parseConsumerAppFileByLine(req.body.user, req.body.date, result, req.body.part ?? null, req.body.parts ?? null);
+  }
+
   console.timeEnd("Parsing")
 
 

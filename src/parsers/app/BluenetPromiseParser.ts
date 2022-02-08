@@ -1,6 +1,5 @@
-import {BaseParser} from "./BaseParser";
+import {BaseParser, fromJSON} from "./BaseParser";
 
-let fromJSON = (d) => { return JSON.parse(d); };
 
 let bluenetPromiseParsers : parserData[] = [
   {type:'bluenetPromise',  label:'promiseStarted',  mapping:['command', {params:fromJSON},'id','appState'], regex:/BluenetPromise: called bluenetPromise\W([\w_]*)\W*with params (\[.*\])\W*for ID:\W(.*)\WAppState:\W(.*)/},

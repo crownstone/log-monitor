@@ -1,4 +1,4 @@
-import {BaseParser} from "./BaseParser";
+import {BaseParser, fromJSON} from "./BaseParser";
 
 /**
  * Sessions are tracked by:
@@ -93,53 +93,51 @@ export const SessionManagerPhases = {
  sessionTimeout:   "sessionManager_sessionTimeout",
 }
 
-let fromJSON = (d) => { d = d.replace(/\\/g,''); return JSON.parse(d); };
-
 export const sessionParsers : parserData[] = [
   {type:'commander',     label:'created',                             mapping: [{targets:(d) => { return d.replace(/"/,'').split(",")}},{commanderOptions: fromJSON}], regex:/Commander: Created for target\W*\[\W([\w\-,]*)[\W\]]*options: ({.*}*)/},
-  {type:'commander',     label:'loadAction',                          mapping: ['commandType','allowMeshRelays','commanderId'], regex:/Commander: Loading command\W*([\w-]*)\W*([\w]*)\W*id:\W*([\w-]*)/},
-  {type:'commander',     label:'failure',                             mapping: ['errorMessage','commanderId'], regex:/Commander: Failed to load command\W*([\w]*)\W*id:\W*([\w-]*)/},
+  {type:'commander',     label:'loadAction',                          mapping: ['commandType','allowMeshRelays','commanderId'], regex:/Commander: Loading command\W*(\S*)\W*([\w]*)\W*id:\W*(\S*)/},
+  {type:'commander',     label:'failure',                             mapping: ['errorMessage','commanderId'], regex:/Commander: Failed to load command\W*([\w]*)\W*id:\W*(\S*)/},
 
   {type:'command',       label:CommandPhases.created,                 mapping: [{command: fromJSON}],                                                   regex:/BleCommandManager: Loading command\W*({.*})/},
-  {type:'command',       label:CommandPhases.performing,              mapping: ['commandType', 'handle', 'commandId'],                                  regex:/BleCommandManager: Performing command\W*(\w*)\W*on\W*([\w-]*)\W*([\w-]*)/},
-  {type:'command',       label:CommandPhases.succeeded,               mapping: ['commandType', 'handle', 'commandId'],                                  regex:/BleCommandManager: Succeeded command\W*(\w*)\W*on\W*([\w-]*)\W*([\w-]*)/},
-  {type:'command',       label:CommandPhases.failed,                  mapping: ['commandType', 'handle', 'error', 'commandId'],                         regex:/BleCommandManager: Something went wrong while performing\W*(\w*)\W*([\w-]*)\W*(.*)\W*([\w-]*)/},
-  {type:'command',       label:CommandPhases.duplicate,               mapping: ['commandId', 'removedByCommandId', 'commandType','commandTargetType', 'commanderId'], regex:/BleCommandCleaner: Removed command due to duplicate\W*([\w-]*)\W*([\w-]*)\W*([\w-]*)\W*([\w-]*)\W*([\w-]*)/},
+  {type:'command',       label:CommandPhases.performing,              mapping: ['commandType', 'handle', 'commandId'],                                  regex:/BleCommandManager: Performing command\W*(\w*)\W*on\W*(\S*)\W*(\S*)/},
+  {type:'command',       label:CommandPhases.succeeded,               mapping: ['commandType', 'handle', 'commandId'],                                  regex:/BleCommandManager: Succeeded command\W*(\w*)\W*on\W*(\S*)\W*(\S*)/},
+  {type:'command',       label:CommandPhases.failed,                  mapping: ['commandType', 'handle', 'error', 'commandId'],                         regex:/BleCommandManager: Something went wrong while performing\W*(\w*)\W*(\S*)\W*(.*)\W*(\S*)/},
+  {type:'command',       label:CommandPhases.duplicate,               mapping: ['commandId', 'removedByCommandId', 'commandType','commandTargetType', 'commanderId'], regex:/BleCommandCleaner: Removed command due to duplicate\W*(\S*)\W*(\S*)\W*(\S*)\W*(\S*)\W*(\S*)/},
   {type:'command',       label:CommandPhases.loadingBroadcast,        mapping: [{command: fromJSON}], regex:/BroadcastCommandManager: Loading command for broadcast\W*({.*})/},
-  {type:'command',       label:CommandPhases.broadcastDelayed,        mapping: ['commandType','commandId'], regex:/BroadcastCommandManager: Scheduling broadcast for later\W*([\w]*)\W*([\w-]*)/},
-  {type:'command',       label:CommandPhases.broadcastDuplicate,      mapping: ['commandType','commandId'], regex:/BroadcastCommandManager: Remove item from duplicate queue[\W\d]*(\w*)\W*([\w-]*)/},
-  {type:'command',       label:CommandPhases.broadcastStart,          mapping: ['commandType','commandId'], regex:/BroadcastCommandManager: broadcasting\W*(\w*)\W*([\w-]*)/},
-  {type:'command',       label:CommandPhases.broadcastSuccess,        mapping: ['commandType','commandId'], regex:/BroadcastCommandManager: Successfully broadcast\W*(\w*)\W*([\w-]*)/},
-  {type:'command',       label:CommandPhases.broadcastError,          mapping: ['commandType','commandId','error'], regex:/BroadcastCommandManager: Error broadcasting\W*(\w*)\W*([\w-]*)[\W]*([\w]*)/},
+  {type:'command',       label:CommandPhases.broadcastDelayed,        mapping: ['commandType','commandId'], regex:/BroadcastCommandManager: Scheduling broadcast for later\W*([\w]*)\W*(\S*)/},
+  {type:'command',       label:CommandPhases.broadcastDuplicate,      mapping: ['commandType','commandId'], regex:/BroadcastCommandManager: Remove item from duplicate queue[\W\d]*(\w*)\W*(\S*)/},
+  {type:'command',       label:CommandPhases.broadcastStart,          mapping: ['commandType','commandId'], regex:/BroadcastCommandManager: broadcasting\W*(\w*)\W*(\S*)/},
+  {type:'command',       label:CommandPhases.broadcastSuccess,        mapping: ['commandType','commandId'], regex:/BroadcastCommandManager: Successfully broadcast\W*(\w*)\W*(\S*)/},
+  {type:'command',       label:CommandPhases.broadcastError,          mapping: ['commandType','commandId','error'], regex:/BroadcastCommandManager: Error broadcasting\W*(\w*)\W*(\S*)[\W]*([\w]*)/},
 
-  {type:'sessionBroker', label: SessionBrokerPhases.requesting,       mapping: ["handle", "commanderId", "privateRequest", "commandType"], regex:/SessionBroker: actually requesting session\W*([\w-]*)\W*for\W*([\w-]*).*private\W*(\w*)\W*commandType\W*([\w-]*)/},
-  {type:'sessionBroker', label: SessionBrokerPhases.connected,        mapping: ["handle", "commanderId"], regex:/SessionBroker: Session has connected to\W*([\w-]*)\W*for\W*([\w-]*)/,   },
-  {type:'sessionBroker', label: SessionBrokerPhases.alreadyConnected, mapping: ["handle", "commanderId"], regex:/SessionBroker: Require session has thrown an ALREADY_REQUESTED_TIMEOUT error\W*([\w-]*)\W*,\W*([\w-]*)\W*/},
-  {type:'sessionBroker', label: SessionBrokerPhases.timeout,          mapping: ["handle", "commanderId"], regex:/SessionBroker: Session failed to connect: SESSION_REQUEST_TIMEOUT\W*([\w-]*)\W*for\W*([\w-]*)/},
-  {type:'sessionBroker', label: SessionBrokerPhases.removedFromQueue, mapping: ["handle", "commanderId"], regex:/SessionBroker: Session removed from queue\W*([\w-]*)\W*for\W*([\w-]*)/},
-  {type:'sessionBroker', label: SessionBrokerPhases.failed,           mapping: ["handle", "commanderId"], regex:/SessionBroker: Failed to request session\W*([\w-]*)\W*for\W*([\w-]*)/},
-  {type:'sessionBroker', label: SessionBrokerPhases.revoke,           mapping: ["handle", "commanderId"], regex:/SessionBroker: Revoke session\W*([\w-]*)\W*for\W*([\w-]*)/},
-  {type:'sessionBroker', label: SessionBrokerPhases.success,          mapping: ["commandId", "commanderId"], regex:/SessionBroker: Command finished.\W*([\w-]*)\W*([\w-]*)\W/},
+  {type:'sessionBroker', label: SessionBrokerPhases.requesting,       mapping: ["handle", "commanderId", "privateRequest", "commandType"], regex:/SessionBroker: actually requesting session\W*(\S*)\W*for\W*(\S*).*private\W*(\w*)\W*commandType\W*(\S*)/},
+  {type:'sessionBroker', label: SessionBrokerPhases.connected,        mapping: ["handle", "commanderId"], regex:/SessionBroker: Session has connected to\W*(\S*)\W*for\W*(\S*)/,   },
+  {type:'sessionBroker', label: SessionBrokerPhases.alreadyConnected, mapping: ["handle", "commanderId"], regex:/SessionBroker: Require session has thrown an ALREADY_REQUESTED_TIMEOUT error\W*(\S*)\W*,\W*(\S*)\W*/},
+  {type:'sessionBroker', label: SessionBrokerPhases.timeout,          mapping: ["handle", "commanderId"], regex:/SessionBroker: Session failed to connect: SESSION_REQUEST_TIMEOUT\W*(\S*)\W*for\W*(\S*)/},
+  {type:'sessionBroker', label: SessionBrokerPhases.removedFromQueue, mapping: ["handle", "commanderId"], regex:/SessionBroker: Session removed from queue\W*(\S*)\W*for\W*(\S*)/},
+  {type:'sessionBroker', label: SessionBrokerPhases.failed,           mapping: ["handle", "commanderId"], regex:/SessionBroker: Failed to request session\W*(\S*)\W*for\W*(\S*)/},
+  {type:'sessionBroker', label: SessionBrokerPhases.revoke,           mapping: ["handle", "commanderId"], regex:/SessionBroker: Revoke session\W*(\S*)\W*for\W*(\S*)/},
+  {type:'sessionBroker', label: SessionBrokerPhases.success,          mapping: ["commandId", "commanderId"], regex:/SessionBroker: Command finished.\W*(\S*)\W*(\S*)/},
 
-  {type:'sessionManager', label: SessionManagerPhases.sessionTimeout, mapping: ["handle", "commanderId"], regex:/SessionManager: SESSION_REQUEST_TIMEOUT Timeout called for\W*([\w-]*)\W*([\w-]*)/},
+  {type:'sessionManager', label: SessionManagerPhases.sessionTimeout, mapping: ["handle", "commanderId"], regex:/SessionManager: SESSION_REQUEST_TIMEOUT Timeout called for\W*(\S*)\W*(\S*)/},
 
 
-  {type:'session', label: SessionPhases.created,                      mapping:['handle','sessionId'],                      regex:/Session: Creating session\W*([\w-]*)\W*([\w-]*)/},
-  {type:'session', label: SessionPhases.connecting,                   mapping:['handle','sessionId'],                      regex:/Session: Start connecting to\W*([\w-]*)\W*([\w-]*)/},
-  {type:'session', label: SessionPhases.connected,                    mapping:['handle','sessionId'],                      regex:/Session: Connected to\W*([\w-]*)\W*([\w-]*)/},
-  {type:'session', label: SessionPhases.connectingFailed,             mapping:['error','handle','sessionId','killedFlag'], regex:/Session: Failed to connect\W*([^,^ ]*) ([\w-]*) ([\w-]*) ([\w-]*)/},
-  {type:'session', label: SessionPhases.retryConnection,              mapping:['handle','sessionId'],                      regex:/Session: Reinitializing the bootstrapper to reactivate the session\W*([\w-]*)\W*([\w-]*)/},
-  {type:'session', label: SessionPhases.performCommand,               mapping:['commandId', 'handle','sessionId'],         regex:/Session: performing available command\W*([\w-]*)\W*([\w-]*)\W*([\w-]*)/},
-  {type:'session', label: SessionPhases.performedCommand,             mapping:['commandId', 'handle','sessionId'],         regex:/Session: Finished available command\W*([\w-]*)\W*([\w-]*)\W*([\w-]*)/},
-  {type:'session', label: SessionPhases.interrupted,                  mapping:['handle','sessionId'],                      regex:/Session: Session interrupted\W*([\w-]*)\W*([\w-]*)/},
-  {type:'session', label: SessionPhases.killRequest,                  mapping: ["state", "handle", "sessionId"],           regex:/Session: killing session requested...\W*(\w*)\W*([\w-]*)\W*([\w-]*)/},
-  {type:'session', label: SessionPhases.killCompleted,                mapping: ["handle", "sessionId"],                    regex:/Session: killing session completed\W*([\w-]*)\W*([\w-]*)/},
-  {type:'session', label: SessionPhases.ended,                        mapping: ["handle", "sessionId"],                    regex:/Session: Session has ended\W*([\w-]*)\W*([\w-]*)/},
-  {type:'session', label: SessionPhases.disconnectingCommand,         mapping: ["handle", "sessionId"],                    regex:/Session: telling the Crownstone to disconnect\W*([\w-]*)\W*([\w-]*)/},
-  {type:'session', label: SessionPhases.disconnectingPhone,           mapping: ["handle", "sessionId"],                    regex:/Session: disconnecting from phone\W*([\w-]*)\W*([\w-]*)/},
-  {type:'session', label: SessionPhases.disconnectPromiseDone,        mapping: ["handle", "sessionId"],                    regex:/Session: disconnect done\W*([\w-]*)\W*([\w-]*)/},
-  {type:'session', label: SessionPhases.disconnectedRetry,            mapping: ["handle", "sessionId"],                    regex:/Session: Disconnected from Crownstone, Ready for reconnect\W*([\w-]*)\W*([\w-]*)/},
-  {type:'session', label: SessionPhases.disconnected,                 mapping: ["handle", "sessionId"],                    regex:/Session: Disconnected from Crownstone, ending session\W*([\w-]*)\W*([\w-]*)/},
+  {type:'session', label: SessionPhases.created,                      mapping:['handle','sessionId'],                      regex:/Session: Creating session\W*(\S*)\W*(\S*)/},
+  {type:'session', label: SessionPhases.connecting,                   mapping:['handle','sessionId'],                      regex:/Session: Start connecting to\W*(\S*)\W*(\S*)/},
+  {type:'session', label: SessionPhases.connected,                    mapping:['handle','sessionId'],                      regex:/Session: Connected to\W*(\S*)\W*(\S*)/},
+  {type:'session', label: SessionPhases.connectingFailed,             mapping:['error','handle','sessionId','killedFlag'], regex:/Session: Failed to connect\W*([^,^ ]*) ([\w-:]*) (\S*) (\S*)/},
+  {type:'session', label: SessionPhases.retryConnection,              mapping:['handle','sessionId'],                      regex:/Session: Reinitializing the bootstrapper to reactivate the session\W*(\S*)\W*(\S*)/},
+  {type:'session', label: SessionPhases.performCommand,               mapping:['commandId', 'handle','sessionId'],         regex:/Session: performing available command\W*(\S*)\W*(\S*)\W*(\S*)/},
+  {type:'session', label: SessionPhases.performedCommand,             mapping:['commandId', 'handle','sessionId'],         regex:/Session: Finished available command\W*(\S*)\W*(\S*)\W*(\S*)/},
+  {type:'session', label: SessionPhases.interrupted,                  mapping:['handle','sessionId'],                      regex:/Session: Session interrupted\W*(\S*)\W*(\S*)/},
+  {type:'session', label: SessionPhases.killRequest,                  mapping: ["state", "handle", "sessionId"],           regex:/Session: killing session requested...\W*(\w*)\W*(\S*)\W*(\S*)/},
+  {type:'session', label: SessionPhases.killCompleted,                mapping: ["handle", "sessionId"],                    regex:/Session: killing session completed\W*(\S*)\W*(\S*)/},
+  {type:'session', label: SessionPhases.ended,                        mapping: ["handle", "sessionId"],                    regex:/Session: Session has ended\W*(\S*)\W*(\S*)/},
+  {type:'session', label: SessionPhases.disconnectingCommand,         mapping: ["handle", "sessionId"],                    regex:/Session: telling the Crownstone to disconnect\W*(\S*)\W*(\S*)/},
+  {type:'session', label: SessionPhases.disconnectingPhone,           mapping: ["handle", "sessionId"],                    regex:/Session: disconnecting from phone\W*(\S*)\W*(\S*)/},
+  {type:'session', label: SessionPhases.disconnectPromiseDone,        mapping: ["handle", "sessionId"],                    regex:/Session: disconnect done\W*(\S*)\W*(\S*)/},
+  {type:'session', label: SessionPhases.disconnectedRetry,            mapping: ["handle", "sessionId"],                    regex:/Session: Disconnected from Crownstone, Ready for reconnect\W*(\S*)\W*(\S*)/},
+  {type:'session', label: SessionPhases.disconnected,                 mapping: ["handle", "sessionId"],                    regex:/Session: Disconnected from Crownstone, ending session\W*(\S*)\W*(\S*)/},
 ];
 
 

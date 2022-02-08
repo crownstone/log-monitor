@@ -11,6 +11,11 @@ export const FileUtil = {
   },
 
 
+  // getStream: function (filePath) {
+  //   return {"CUSTOM": [{date: "CUSTOM", processed:  false, size: sizes[date]}]}
+  // },
+
+
   getUsers: function() : {[userName: string] : any } {
     let items = FileUtil.getDirectoryPaths(USER_PATH)
 

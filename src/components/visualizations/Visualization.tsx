@@ -4,16 +4,16 @@ import {Cloud}           from "./Cloud";
 import {Notifications}   from "./Notifications";
 import {BluenetPromises} from "./BluenetPromises";
 
-export function Visualization({user, date, type, part, parts}) {
-  switch (type) {
+export function Visualization(props : {user?: string, date?: string, type?: string, part?: number, parts?: number, path?: string}) {
+  switch (props.type) {
     case "Constellation":
-      return <Constellation user={user} date={date} part={part} parts={parts} />
+      return <Constellation user={props.user} date={props.date} part={props.part} parts={props.parts} path={props.path} />
     case "Cloud":
-      return <Cloud user={user} date={date} part={part} parts={parts} />
+      return <Cloud user={props.user} date={props.date} part={props.part} parts={props.parts} path={props.path} />
     case "Notifications":
-      return <Notifications user={user} date={date} part={part} parts={parts} />
+      return <Notifications user={props.user} date={props.date} part={props.part} parts={props.parts} path={props.path} />
     case "BluenetPromises":
-      return <BluenetPromises user={user} date={date} part={part} parts={parts} />
+      return <BluenetPromises user={props.user} date={props.date} part={props.part} parts={props.parts} path={props.path} />
     default:
       return <div>Not implemented yet..</div>
   }
