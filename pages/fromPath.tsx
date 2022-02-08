@@ -19,7 +19,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
   }
 }
 
-export default class FileOverview extends React.Component<any, { selectedPath: any, selectedType: any }> {
+export default class FromPath extends React.Component<any, { selectedPath: any, selectedType: any, streamData: boolean }> {
 
   db : GlobalStateKeeper;
   unsubscribe = [];
@@ -28,6 +28,7 @@ export default class FileOverview extends React.Component<any, { selectedPath: a
     super(params);
     this.state = {
       selectedPath: null,
+      streamData: false,
       selectedType: null,
     }
   }
@@ -36,7 +37,8 @@ export default class FileOverview extends React.Component<any, { selectedPath: a
     this.db = new GlobalStateKeeper();
     this.setState({
       selectedPath: this.db.get('selectedPath'),
-      selectedType: this.db.get('selectedStreamType'),
+      streamData:   this.db.get('streamData') ?? false,
+      selectedType: this.db.get('selectedPathType'),
     })
   }
 
@@ -72,9 +74,10 @@ export default class FileOverview extends React.Component<any, { selectedPath: a
             phase={phase}
           />
 
-          <FileSelection phase={phase} selectFile={(path) => {
-            this.setState({selectedPath: path})
+          <FileSelection phase={phase} streamValue={this.state.streamData} selectFile={(path, stream) => {
+            this.setState({selectedPath: path, streamData: stream})
             this.db.set('selectedPath', path);
+            this.db.set('streamData', stream);
           }}/>
 
           <TypeContainer
@@ -84,7 +87,7 @@ export default class FileOverview extends React.Component<any, { selectedPath: a
 
           {phase >= 2 &&
             <Visualization
-              stream={true}
+              stream={this.state.streamData}
               path={this.state.selectedPath}
               type={this.state.selectedType}
             />

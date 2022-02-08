@@ -1,11 +1,12 @@
 import {colors} from "../../styles/colors";
-import {Button, Grid, TextField} from "@mui/material";
+import {Button, Checkbox, FormControlLabel, FormGroup, Grid, TextField} from "@mui/material";
 import React, {useState} from "react";
 import { AnimatedGrid } from "../animating/AnimatedGrid";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 
-export function FileSelection({phase, selectFile}) {
+export function FileSelection({phase, selectFile, streamValue}) {
   let [ path, setPath ] = useState('')
+  let [ stream, setStream ] = useState(streamValue)
 
   return (
     <AnimatedGrid item style={{minHeight: '100vh', maxWidth: '40vw', flex: phase === 0 ? 1 : 0, backgroundColor: phase === 0 ? colors.white.hex : colors.green.hex}}>
@@ -23,7 +24,16 @@ export function FileSelection({phase, selectFile}) {
           />
           <br />
           <br />
-          <Button variant="contained" startIcon={<ArrowRightIcon />} onClick={() => { selectFile(path); }}>
+          <FormGroup>
+            <FormControlLabel control={<Checkbox
+              checked={stream}
+              onChange={(event) => {
+                setStream(event.target.value);
+              }}
+              inputProps={{ 'aria-label': 'controlled' }}
+            />} label="Streaming (auto-refresh)" />
+          </FormGroup>
+          <Button variant="contained" startIcon={<ArrowRightIcon />} onClick={() => { selectFile(path, stream); }}>
             {"START"}
           </Button>
         </Grid> : <div />

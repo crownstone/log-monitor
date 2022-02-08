@@ -65,9 +65,17 @@ export async function parseCustomFileByLine(filePath, result) {
   let amountOfLines = await getLineCount(filePath)
   console.log("total line count =", amountOfLines)
 
+  await _parseAppLog(filePath, result);
+}
+
+
+export async function parseCustomFileByLineForStreaming(filePath, result) {
+  let amountOfLines = await getLineCount(filePath)
+  console.log("total line count =", amountOfLines)
+
   let startLine = 0;
   let endLine = 0;
- 
+
   if (amountOfLines > 2e4) {
     endLine = amountOfLines;
     startLine = endLine - 2e4;
