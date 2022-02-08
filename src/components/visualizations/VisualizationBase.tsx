@@ -5,7 +5,7 @@ import {Util} from "../../util/Util";
 
 
 export class VisualizationBase<T> extends React.Component<
-  { user?: string, date?: string, part?: number, any?, parts?: number, path?: string},
+  { user?: string, date?: string, part?: number, any?, parts?: number, path?: string, stream?: boolean},
   { loadedData: boolean, drawData: boolean, showConfig: boolean, showHelp: boolean, any? }
   >{
 
@@ -14,7 +14,11 @@ export class VisualizationBase<T> extends React.Component<
   data : ParseDataResult = {};
   unsubscribe = []
 
-  type: string
+  type: string;
+
+  streamTimeout = null;
+
+
 
   constructor(props, type) {
     super(props)
@@ -42,6 +46,7 @@ export class VisualizationBase<T> extends React.Component<
 
 
   componentWillUnmount() {
+    clearTimeout(this.streamTimeout);
     this.unsubscribe.forEach((unsub) => { unsub(); });
   }
 
@@ -84,6 +89,30 @@ export class VisualizationBase<T> extends React.Component<
     SharedEventBus.emit("PARSED_DATA");
     this.setState({loadedData:true});
     setTimeout(() => { this.setState({drawData: true})}, 100);
+    if (this.props.stream) {
+      clearTimeout(this.streamTimeout);
+      this.streamTimeout = setTimeout(() => {
+        this.update()
+      }, 5000);
+    }
+  }
+
+  async update() {
+    this.data = await Util.postData(`http://localhost:3000/api/getParsedProps`, {
+      path:  this.props.path,
+      user:  this.props.user,
+      date:  this.props.date,
+      type:  this.type,
+      part:  this.props.part,
+      parts: this.props.parts,
+    });
+    this.eventBus.emit("NEW_DATA", this.data);
+    if (this.props.stream) {
+      clearTimeout(this.streamTimeout);
+      this.streamTimeout = setTimeout(() => {
+        this.update()
+      }, 5000);
+    }
   }
 
 

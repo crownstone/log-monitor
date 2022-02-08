@@ -1,12 +1,14 @@
 import {DataFlowManagerEvents} from "./DataFlowManager_events";
 import {getGroupName} from "../parsers/util";
+import {EventBusClass} from "../util/EventBus";
 
 export class BluenetPromiseDataFlowManager extends DataFlowManagerEvents {
 
   options : any;
+  idMap = {};
 
-  constructor(options : BluenetPromiseConfig = {}) {
-    super();
+  constructor(eventBus : EventBusClass, options : BluenetPromiseConfig = {}) {
+    super(eventBus, options);
     this.options = options?.dataflow ?? {};
   }
 
@@ -26,7 +28,9 @@ export class BluenetPromiseDataFlowManager extends DataFlowManagerEvents {
     if (this.rangeDataGroups['promises_error']   === undefined) { this.rangeDataGroups['promises_error']   = []; }
     if (this.rangeDataGroups['promises_error_connection_cancelled'] === undefined) { this.rangeDataGroups['promises_error_connection_cancelled'] = []; }
 
+    let index = 0;
     for (let promise of promises) {
+      this.idMap[promise.id] = index++;
       groups[promise.command] = {id: promise.command, content: promise.command, style:'width: 300px'};
       if (promise.success) {
         let handle = promise.params[0];
@@ -55,7 +59,7 @@ export class BluenetPromiseDataFlowManager extends DataFlowManagerEvents {
     this.loadReboots(data);
     this.loadStartEndTimes(data);
     this.loadLocalization(data);
-    this.groupDataSet.add(Object.values(groups));
+    this.groupDataSet.update(Object.values(groups));
   }
 
 }

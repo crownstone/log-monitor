@@ -62,7 +62,18 @@ export async function parseConsumerAppFileByLine(user, date, result, part: numbe
 
 
 export async function parseCustomFileByLine(filePath, result) {
-  await _parseAppLog(filePath, result);
+  let amountOfLines = await getLineCount(filePath)
+  console.log("total line count =", amountOfLines)
+
+  let startLine = 0;
+  let endLine = 0;
+
+  if (amountOfLines > 1e4) {
+    endLine = amountOfLines;
+    startLine = endLine - 1e4;
+  }
+
+  await _parseAppLog(filePath, result, startLine, endLine);
 }
 
 

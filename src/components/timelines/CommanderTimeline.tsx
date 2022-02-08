@@ -25,9 +25,9 @@ export class CommanderTimeline extends React.Component<{
     super(params);
     this.state = {overlayContent: null};
 
-    this.dataFlowManager_public    = new CommanderDataFlowManager('public', this.props.config);
-    this.dataFlowManager_private   = new CommanderDataFlowManager('private');
-    this.dataFlowManager_broadcast = new CommanderDataFlowManager('broadcasters');
+    this.dataFlowManager_public    = new CommanderDataFlowManager(this.props.eventBus,'public', this.props.config);
+    this.dataFlowManager_private   = new CommanderDataFlowManager(this.props.eventBus,'private');
+    this.dataFlowManager_broadcast = new CommanderDataFlowManager(this.props.eventBus,'broadcasters');
 
     this.dfTimeline_public    = new DataFlowTimeline(this.dataFlowManager_public,    this.props.eventBus);
     this.dfTimeline_private   = new DataFlowTimeline(this.dataFlowManager_private,   this.props.eventBus);

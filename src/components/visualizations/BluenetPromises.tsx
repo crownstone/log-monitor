@@ -18,7 +18,6 @@ function getBluenetPromiseConfig() : BluenetPromiseConfig {
 
 export class BluenetPromises extends VisualizationBase<BluenetPromiseConfig> {
   contentData = null;
-  countData = null;
 
   constructor(props) {
     super(props, 'bluenetPromises');
@@ -60,8 +59,7 @@ export class BluenetPromises extends VisualizationBase<BluenetPromiseConfig> {
             </Paper>
           </Backdrop>
 
-          {/*{ this.contentData && <Details notification={this.contentData} /> }*/}
-          { this.countData && <p style={{whiteSpace:'pre-wrap'}}>{JSON.stringify(this.countData, undefined, 2)}</p> }
+          { this.contentData && <p style={{whiteSpace:'pre-wrap'}}>{JSON.stringify(this.contentData, undefined, 2)}</p> }
         </Grid>
       );
     }

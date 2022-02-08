@@ -13,7 +13,7 @@ export class BluenetPromiseCountGraph extends React.Component<{ data: ParseDataR
   constructor(props) {
     super(props);
     this.state = {overlayContent: null};
-    this.dataFlowManager = new BluenetPromiseCountDataFlowManager(this.props.config);
+    this.dataFlowManager = new BluenetPromiseCountDataFlowManager(this.props.eventBus, this.props.config);
     this.dataFlowGraph = new DataFlowGraph(this.dataFlowManager, this.props.eventBus);
   }
 

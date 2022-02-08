@@ -13,7 +13,7 @@ export class BluenetPromiseTimeline extends React.Component<{ data: ParseDataRes
   constructor(props) {
     super(props);
     this.state = {overlayContent: null};
-    this.dataFlowManager = new BluenetPromiseDataFlowManager(this.props.config);
+    this.dataFlowManager = new BluenetPromiseDataFlowManager(this.props.eventBus, this.props.config);
     this.dataFlowTimeline = new DataFlowTimeline(this.dataFlowManager, this.props.eventBus);
   }
 
@@ -41,10 +41,15 @@ export class BluenetPromiseTimeline extends React.Component<{ data: ParseDataRes
 
     this.dataFlowTimeline.create(viscontainer, options)
     this.dataFlowTimeline.on('select', (properties) => {
-      if (properties.items) {
-        // if (this.props.data?.notifications?.requests?.[properties.items]) {
-        //   this.props.dataCallback(this.props.data.notifications.requests[properties.items])
-        // }
+      if (properties.items && properties.items.length > 0) {
+        let id = properties.items[0];
+        let index = this.dataFlowManager.idMap[id];
+
+        let data = this.props.data?.bluenetPromises?.promises?.[index];
+        console.log(id, index, data)
+        if (data) {
+          this.props.dataCallback(data);
+        }
       }
     });
 

@@ -1,11 +1,12 @@
 import {DataFlowManagerBase} from "./DataFlowManagerBase";
+import {EventBusClass} from "../util/EventBus";
 
 export class DataFlowManagerEvents extends DataFlowManagerBase {
 
   options: DataFlowOptions
 
-  constructor(options : DataFlowConfig = {}) {
-    super();
+  constructor(eventBus : EventBusClass, options : DataFlowConfig = {}) {
+    super(eventBus);
     this.options = options?.dataflow ?? {};
   }
 

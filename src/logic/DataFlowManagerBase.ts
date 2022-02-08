@@ -1,4 +1,5 @@
 import * as vis from "vis-timeline/standalone/umd/vis-timeline-graph2d";
+import {EventBusClass} from "../util/EventBus";
 
 export class DataFlowManagerBase {
 
@@ -6,6 +7,9 @@ export class DataFlowManagerBase {
   priority : string[] = []
 
   itemThreshold = 1300;
+
+  eventBus : EventBusClass;
+  subscriptions = [];
 
   eventDataGroups : {[typeId: number]: any[]} = {}
   graphDataGroups : {[typeId: number]: any[]} = {}
@@ -18,15 +22,22 @@ export class DataFlowManagerBase {
   endTime = Infinity;
 
   getTimeout = null;
-
   breakTime = null;
 
-  constructor() {
+  lastGetStartTime = null;
+  lastGetEndTime   = null;
+
+  constructor(eventBus: EventBusClass) {
+    this.eventBus = eventBus;
     this.itemDataSet  = new vis.DataSet([], {queue: true});
     this.groupDataSet = new vis.DataSet([], {queue: true});
+
+    this.eventBus.on("NEW_DATA", (data) => { this.update(data); })
   }
 
   reset() {
+    this.subscriptions.forEach((s) => { s(); });
+    this.subscriptions = [];
     this.itemDataSet.clear();
     this.groupDataSet.clear();
     this.groupDataSet.flush();
@@ -38,6 +49,15 @@ export class DataFlowManagerBase {
   load(data: ParseDataResult) {
     this.reset();
     this.loadSpecificData(data);
+  }
+
+  update(data) {
+    this.eventDataGroups = {};
+    this.graphDataGroups = {};
+    this.rangeDataGroups = {};
+    this.loadSpecificData(data);
+    this.eventBus.emit("UPDATED_DATAFLOW_MANAGER");
+    this.get(this.lastGetStartTime, this.lastGetEndTime);
   }
 
   loadSpecificData(data: ParseDataResult) {
@@ -58,6 +78,8 @@ export class DataFlowManagerBase {
 
   get(start: number, end: number) {
     this.itemDataSet.clear();
+    this.lastGetStartTime = start;
+    this.lastGetEndTime   = end;
 
     let endTime = -Infinity;
     let aborted = false;

@@ -60,7 +60,7 @@ export class CloudDataFlowManager extends DataFlowManagerEvents {
     for (let key in this.rangeDataGroups) {
       this.rangeDataGroups[key].sort((a,b) => { return a.end - b.end})
     }
-    this.groupDataSet.add(Object.values(groups));
+    this.groupDataSet.update(Object.values(groups));
   }
 
 }

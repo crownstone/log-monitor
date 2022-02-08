@@ -48,7 +48,7 @@ export class NotificationsDataFlowManager extends DataFlowManagerEvents {
     this.loadReboots(data);
     this.loadStartEndTimes(data);
     this.loadLocalization(data);
-    this.groupDataSet.add(Object.values(groups));
+    this.groupDataSet.update(Object.values(groups));
   }
 
 }

@@ -75,3 +75,10 @@
     border-width:1px;
     border-color: #d48435;
 }
+
+.promiseGraphPoints {
+    fill:#4f81bd;
+    fill-opacity:0;
+    stroke-width:2px;
+    stroke: #4f81bd;
+}

@@ -23,9 +23,6 @@ export class DataFlowGraph {
 
     this.timeline.on('rangechange',(data) => {
       this.eventBus.emit("RANGE_CHANGED", data);
-      // this.dataFlowManager.delayedGet(data.start.valueOf(), data.end.valueOf(), () => {
-      //   this._updateDynamicItems()
-      // })
     })
 
     this.unsubscribe.push(this.eventBus.on("RANGE_CHANGED", (data) => {

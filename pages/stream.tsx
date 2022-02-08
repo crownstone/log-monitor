@@ -64,7 +64,7 @@ export default class FileOverview extends React.Component<any, { selectedPath: a
               this.db.set('selectedStreamType', null);
               this.db.remove('selectedStreamType');
             }}
-            clearTypeData={(data) => {this.setState({selectedType:data}); this.db.set('selectedStreamType', null)}}
+            clearTypeData={() => {this.setState({selectedType:null}); this.db.set('selectedStreamType', null)}}
             viz={{
               settings: () => { SharedEventBus.emit("SHOW_SETTINGS"); },
               help:     () => { SharedEventBus.emit("SHOW_HELP"); },
@@ -84,6 +84,7 @@ export default class FileOverview extends React.Component<any, { selectedPath: a
 
           {phase >= 2 &&
             <Visualization
+              stream={true}
               path={this.state.selectedPath}
               type={this.state.selectedType}
             />

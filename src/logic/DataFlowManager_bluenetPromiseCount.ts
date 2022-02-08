@@ -1,11 +1,12 @@
-import {DataFlowManagerEvents} from "./DataFlowManager_events";
+import {DataFlowManagerBase} from "./DataFlowManagerBase";
+import {EventBusClass} from "../util/EventBus";
 
-export class BluenetPromiseCountDataFlowManager extends DataFlowManagerEvents {
+export class BluenetPromiseCountDataFlowManager extends DataFlowManagerBase {
 
   options : any;
 
-  constructor(options : BluenetPromiseConfig = {}) {
-    super();
+  constructor(eventBus : EventBusClass, options : BluenetPromiseConfig = {}) {
+    super(eventBus);
     this.options = options?.dataflow ?? {};
   }
 
@@ -20,15 +21,14 @@ export class BluenetPromiseCountDataFlowManager extends DataFlowManagerEvents {
     if (this.graphDataGroups['count'] === undefined) { this.graphDataGroups['count'] = []; }
 
     for (let count of counts) {
-      this.graphDataGroups['count'].push({x: count.t, y: Number(count.value), group:1});
+      this.graphDataGroups['count'].push({x: count.t, y: Number(count.value), group:'1'});
     }
 
-    this.groupDataSet.add({
-      id: 1,
+    this.groupDataSet.update({
+      id: '1',
       content: 'Open promises',
-      // Optional: a field 'visible'
-      // Optional: a field 'className'
-      // Optional: options
+      options: { drawPoints: { style: "circle", size: 4 } },
+      className: 'promiseGraphPoints'
     })
   }
 

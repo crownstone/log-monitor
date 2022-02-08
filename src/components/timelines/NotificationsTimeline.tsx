@@ -13,7 +13,7 @@ export class NotificationsTimeline extends React.Component<{ data: ParseDataResu
   constructor(props) {
     super(props);
     this.state = {overlayContent: null};
-    this.dataFlowManager = new NotificationsDataFlowManager(this.props.config);
+    this.dataFlowManager = new NotificationsDataFlowManager(this.props.eventBus, this.props.config);
     this.dataFlowTimeline = new DataFlowTimeline(this.dataFlowManager, this.props.eventBus);
   }
 

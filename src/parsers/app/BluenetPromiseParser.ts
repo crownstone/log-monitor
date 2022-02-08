@@ -2,14 +2,13 @@ import {BaseParser, fromJSON} from "./BaseParser";
 
 
 let bluenetPromiseParsers : parserData[] = [
-  {type:'bluenetPromise',  label:'promiseStarted',  mapping:['command', {params:fromJSON},'id','appState'], regex:/BluenetPromise: called bluenetPromise\W([\w_]*)\W*with params (\[.*\])\W*for ID:\W(.*)\WAppState:\W(.*)/},
-  {type:'bluenetPromise',  label:'promiseRejected', mapping:['command','error','id','appState'],            regex:/BluenetPromise: promise rejected in bridge:\W*([\w_]*)  error:\W(.*)\Wfor ID:\W(.*)\WAppState: (.*)/},
-  {type:'bluenetPromise',  label:'promiseResolved', mapping:['command','result','id','appState'],           regex:/BluenetPromise: promise resolved in bridge:\W*([\w_]*)\W*with data:\W*(.*) for ID:\W*([\w\d.]*)\WAppState:\W(\w*)/},
-  {type:'bluenetPromise',  label:'promiseResolved', mapping:['command','result','id','appState'],           regex:/BluenetPromise: promise resolved in bridge:\W*([\w_]*)\W*npm start:\W*(.*) for ID:\W*([\w\d.]*)\WAppState:\W(\w*)/},
-  {type:'bluenetPromise',  label:'promiseCount',    mapping:['count'],                                      regex:/BluenetPromise: newPromise\W*Amount of currently open promises:\W(\d*)/},
-  // {type:'bluenetPromise',  label:'openPromises_start', mapping:[{openPromises:fromJSON}],                      regex:/BluenetPromise: newPromise\W*Currently open promises:\W({.*})/},
-  {type:'bluenetPromise',  label:'promiseCount',    mapping:['count'],                                      regex:/BluenetPromise: donePromise\W*Amount of currently open promises:\W(\d*)/},
-  // {type:'bluenetPromise',  label:'openPromises_done',  mapping:[{openPromises:fromJSON}],                      regex:/BluenetPromise: donePromise\W*Currently open promises:\W({.*})/},
+  {type:'bluenetPromise',  label:'promiseStarted',  mapping:['command', {params:fromJSON},'id','appState'], regex:/BluenetPromise: called bluenetPromise\s([\w_]*)\s*with params (\[.*\])\s*for ID:\s(.*)\sAppState:\s(.*)/},
+  {type:'bluenetPromise',  label:'promiseRejected', mapping:['command','error','id','appState'],            regex:/BluenetPromise: promise rejected in bridge:\s*([\w_]*)  error:\s(.*)\sfor ID:\s(.*)\sAppState: (.*)/},
+  {type:'bluenetPromise',  label:'promiseResolved', mapping:['command','result','id','appState'],           regex:/BluenetPromise: promise resolved in bridge:\s*([\w_]*)\s*with data:\s*(.*) for ID:\s*([\w\d.]*)\sAppState:\s(\w*)/},
+  {type:'bluenetPromise',  label:'promiseCount',    mapping:['count'],                                      regex:/BluenetPromise: newPromise\s*Amount of currently open promises:\s(\d*)/},
+  // {type:'bluenetPromise',  label:'openPromises_start', mapping:[{openPromises:fromJSON}],                      regex:/BluenetPromise: newPromise\s*Currently open promises:\s({.*})/},
+  {type:'bluenetPromise',  label:'promiseCount',    mapping:['count'],                                      regex:/BluenetPromise: donePromise\s*Amount of currently open promises:\s(\d*)/},
+  // {type:'bluenetPromise',  label:'openPromises_done',  mapping:[{openPromises:fromJSON}],                      regex:/BluenetPromise: donePromise\s*Currently open promises:\s({.*})/},
 ]
 
 class BluenetPromiseCollector {

@@ -31,6 +31,7 @@ export class SessionDataFlowManager extends DataFlowManagerEvents {
   ]
 
   loadSpecificData(data: ParseDataResult) {
+    console.log("load specific data")
     let session;
     let constellation = data?.constellation;
     let sessions = constellation?.sessions;
@@ -72,9 +73,6 @@ export class SessionDataFlowManager extends DataFlowManagerEvents {
         }
 
         this.rangeDataGroups[type].push({id: sessionId, start: session.tStart, end: session.tEnd, group: groupName, className: type});
-        if (sessionId == 'd8efabd8-aea7') {
-          console.log(session)
-        }
         this.startTime = Math.min(this.startTime, session.tStart);
         this.endTime = Math.max(this.endTime, session.tEnd);
       }
@@ -85,7 +83,7 @@ export class SessionDataFlowManager extends DataFlowManagerEvents {
     for (let key in this.rangeDataGroups) {
       this.rangeDataGroups[key].sort((a,b) => { return a.end - b.end})
     }
-    this.groupDataSet.add(Object.values(groups));
+    this.groupDataSet.update(Object.values(groups));
   }
 
 }

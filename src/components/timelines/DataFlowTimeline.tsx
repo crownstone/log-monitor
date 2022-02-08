@@ -34,6 +34,10 @@ export class DataFlowTimeline {
       this.timeline.setWindow(data.start, data.end, {animation: false})
     }))
 
+    this.unsubscribe.push(this.eventBus.on("UPDATED_DATAFLOW_MANAGER", () => {
+      this._updateDynamicItems();
+    }))
+
     // abort marker!
     this._updateDynamicItems()
 

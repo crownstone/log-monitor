@@ -11,8 +11,8 @@ export class CommanderDataFlowManager extends DataFlowManagerEvents {
   ]
 
   commanderType = null;
-  constructor(commanderType: string, options : DataFlowConfig = {}) {
-    super(options);
+  constructor(eventBus, commanderType: string, options : DataFlowConfig = {}) {
+    super(eventBus, options);
     this.commanderType = commanderType;
   }
 
@@ -63,7 +63,6 @@ export class CommanderDataFlowManager extends DataFlowManagerEvents {
         if (!this.rangeDataGroups[this.commanderType]) {
           this.rangeDataGroups[this.commanderType] = [];
         }
-        console.log(commanderId, commander)
         this.rangeDataGroups[this.commanderType].push({
           id:      commanderId,
           start:   commander.tStart,
@@ -85,7 +84,7 @@ export class CommanderDataFlowManager extends DataFlowManagerEvents {
     for (let key in this.rangeDataGroups) {
       this.rangeDataGroups[key].sort((a,b) => { return a.end - b.end})
     }
-    this.groupDataSet.add(Object.values(groups));
+    this.groupDataSet.update(Object.values(groups));
   }
 
 }

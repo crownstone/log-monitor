@@ -13,7 +13,7 @@ export class CloudTimeline extends React.Component<{ data: ParseDataResult, even
   constructor(props) {
     super(props);
     this.state = {overlayContent: null};
-    this.dataFlowManager = new CloudDataFlowManager(this.props.config);
+    this.dataFlowManager = new CloudDataFlowManager(this.props.eventBus, this.props.config);
     this.dataFlowTimeline = new DataFlowTimeline(this.dataFlowManager, this.props.eventBus);
   }
 

@@ -14,7 +14,7 @@ export class SessionTimeline extends React.Component<{ data: ParseDataResult, ev
   constructor(params) {
     super(params);
     this.state = {overlayContent: null};
-    this.dataFlowManager = new SessionDataFlowManager();
+    this.dataFlowManager = new SessionDataFlowManager(this.props.eventBus);
     this.dataFlowTimeline = new DataFlowTimeline(this.dataFlowManager, this.props.eventBus);
   }
 
