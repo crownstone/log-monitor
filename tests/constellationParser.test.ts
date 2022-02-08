@@ -8,6 +8,7 @@ jest.mock("../src/util/config", () => {
 
 import {parseConsumerAppFileByLine} from "../src/parsers/base";
 import {ConstellationParser, sessionParsers} from "../src/parsers/app/ConstellationParser";
+import fs from "fs";
 
 
 beforeEach(async () => {})
@@ -94,33 +95,18 @@ test("Check Constellation Regex correctness", async () => {
   expect(matches).toBe(testString.length)
 })
 
+test("Json parsing", async () => {
+  let a = {A:2}
+  let b = {b:4}
+  let bs = JSON.stringify(b);
+  a['b'] = bs;
+  let as = JSON.stringify(a);
+  console.log(as)
+  console.log(JSON.parse(as))
 
-test("Check Constellation Regex correctness 2", async () => {
-  let exportData = {};
-  let baseParser = new ConstellationParser(exportData);
+  let data = '{"A":2,"b":"{\\"b\\":4}"}'
+  console.log(data, JSON.parse(data))
 
-  let testString = [
-    '1642092969268 - Thu Jan 13 2022 17:56:09 GMT+0100 (CET) - LOGi CONSTELLATION : Session: Failed to connect UNKNOWN ERROR IN connect Error Domain=CBErrorDomain Code=6 "The connection has timed out unexpectedly." UserInfo={NSLocalizedDescription=The connection has timed out unexpectedly.} uuid:4F86C1BE-06EB-493D-A3B7-0A02483003C4 A35D3C74-334E-4CFD-916D-DB9BB4F54938 23d3fa2f-cc6e false false'
-  ];
-
-  let matches = 0;
-  let expected = 0;
-  let lastItem = null;
-  baseParser.handleParseResult = (item, parser, parseResult) => {
-    console.log(parseResult);
-    matches++;
-    if (matches !== expected) {
-      console.log("FAILED", lastItem[1])
-    }
-    expect(matches).toBe(expected);
-  }
-
-  for (let string of testString) {
-    expected++;
-    let item = [123, string];
-    baseParser.load(item);
-    lastItem = item;
-  }
-
-  expect(matches).toBe(testString.length)
+  let file = fs.readFileSync('./tests/test.log', 'utf-8')
+  console.log(file, JSON.parse(file))
 })

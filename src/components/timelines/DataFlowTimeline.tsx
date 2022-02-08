@@ -36,6 +36,7 @@ export class DataFlowTimeline {
 
     this.unsubscribe.push(this.eventBus.on("UPDATED_DATAFLOW_MANAGER", () => {
       this._updateDynamicItems();
+      this.drawMarkers()
     }))
 
     // abort marker!

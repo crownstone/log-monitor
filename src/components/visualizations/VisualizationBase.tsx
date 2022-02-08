@@ -19,7 +19,6 @@ export class VisualizationBase<T> extends React.Component<
   streamTimeout = null;
 
 
-
   constructor(props, type) {
     super(props)
     this.eventBus = new EventBusClass(type);

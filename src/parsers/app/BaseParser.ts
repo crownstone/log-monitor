@@ -1,5 +1,5 @@
 export const fromJSON = (d) => {
-  d = d.replace(/\\/g,'');
+  // d = d.replace(/\\/g,'');
   try {
     return JSON.parse(d);
   }

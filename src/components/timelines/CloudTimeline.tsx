@@ -39,8 +39,8 @@ export class CloudTimeline extends React.Component<{ data: ParseDataResult, even
 
     this.dataFlowTimeline.create(viscontainer, options)
     this.dataFlowTimeline.on('select', (properties) => {
-      if (properties.items) {
-        if (this.props.data?.cloud?.requests?.[properties.items]) {
+      if (properties.items && properties.items.length > 0) {
+        if (this.props.data?.cloud?.requests?.[properties.items[0]]) {
           this.props.cloudDataCallback(this.props.data.cloud.requests[properties.items])
         }
       }

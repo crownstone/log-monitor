@@ -67,10 +67,10 @@ export async function parseCustomFileByLine(filePath, result) {
 
   let startLine = 0;
   let endLine = 0;
-
-  if (amountOfLines > 1e4) {
+ 
+  if (amountOfLines > 2e4) {
     endLine = amountOfLines;
-    startLine = endLine - 1e4;
+    startLine = endLine - 2e4;
   }
 
   await _parseAppLog(filePath, result, startLine, endLine);
