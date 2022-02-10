@@ -6,6 +6,9 @@ import {LocalizationParser} from "./app/LocalizationParser";
 import {CloudParser} from "./app/CloudParser";
 import {NotificationParser} from "./app/NotificationParser";
 import {BluenetPromiseParser} from "./app/BluenetPromiseParser";
+import {UptimeParser} from "./app/UptimeParser";
+import {ScanningParser} from "./app/ScanningParser";
+import { AppStateParser } from "./app/AppStateParser";
 
 
 export function getLineCount(path) {
@@ -76,9 +79,11 @@ export async function parseCustomFileByLineForStreaming(filePath, result) {
   let startLine = 0;
   let endLine = 0;
 
-  if (amountOfLines > 2e4) {
+  let window = 15e3; // amount of lines from the end
+
+  if (amountOfLines > window) {
     endLine = amountOfLines;
-    startLine = endLine - 2e4;
+    startLine = endLine - window;
   }
 
   await _parseAppLog(filePath, result, startLine, endLine);
@@ -89,13 +94,16 @@ function _parseAppLog(filePath: string, result: ParseDataResult, startLine: numb
   return new Promise<void>((resolve, reject) => {
     const file = FileUtil.getFileStream(filePath);
     let parsers = [
-      new NameMapParser(result),
-      new NotificationParser(result),
-      new RebootParser(result),
-      new BluenetPromiseParser(result),
-      new ConstellationParser(result),
-      new LocalizationParser(result),
-      new CloudParser(result),
+      // new NameMapParser(result),
+      // new NotificationParser(result),
+      new UptimeParser(result),
+      // new ScanningParser(result),
+      new AppStateParser(result),
+      // new RebootParser(result),
+      // new BluenetPromiseParser(result),
+      // new ConstellationParser(result),
+      // new LocalizationParser(result),
+      // new CloudParser(result),
     ];
     let total = 0;
     let firstTime = null;

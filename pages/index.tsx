@@ -90,7 +90,7 @@ export default class FileOverview extends React.Component<any, {
               this.db.set('totalParts', null);
               this.db.remove('selectedType');
             }}
-            clearTypeData={(data) => {this.setState({selectedType:data}); this.db.set('selectedType', data)}}
+            clearTypeData={() => {this.setState({selectedType:null}); this.db.set('selectedType', null)}}
             viz={{
               settings: () => { SharedEventBus.emit("SHOW_SETTINGS"); },
               help:     () => { SharedEventBus.emit("SHOW_HELP"); },
