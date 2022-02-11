@@ -9,8 +9,31 @@ interface ParseDataResult {
   notifications?:   NotificationsParseResult,
   bluenetPromises?: BluenetPromisesParseResult,
 
+  uptime?:          UptimeParseResult,
+  appState?:        AppStateParseResult[],
+  scanning?:        ScanningParseResult[],
+
   startTime?: number,
   endTime?:   number,
+}
+
+interface UptimeParseResult {
+  data: {
+    t: number,
+    value: number,
+  }[];
+}
+
+
+interface ScanningParseResult {
+  t: number,
+  state: 'startScanning' | 'startBatterySaving'
+}
+
+
+interface AppStateParseResult {
+  t: number,
+  state: 'active' | 'inactive' | 'background'
 }
 
 

@@ -4,6 +4,7 @@ import {Util} from "../../util/Util";
 import {VisualizationBase} from "./VisualizationBase";
 import {BluenetPromiseTimeline} from "../timelines/BluenetPromiseTimeline";
 import {BluenetPromiseCountGraph} from "../timelines/BluenetPromiseCountGraph";
+import {AppStateTimeline} from "../timelines/AppStateTimeline";
 
 
 function getBluenetPromiseConfig() : BluenetPromiseConfig {
@@ -30,6 +31,12 @@ export class BluenetPromises extends VisualizationBase<BluenetPromiseConfig> {
     if (this.state.drawData) {
       return (
         <Grid item style={{height:'100vh', flex:1, overflow:'auto'}}>
+          <AppStateTimeline
+            data={this.data}
+            eventBus={this.eventBus}
+            dataCallback={() => {}}
+            config={this.config}
+          />
           <BluenetPromiseCountGraph
             data={this.data}
             eventBus={this.eventBus}

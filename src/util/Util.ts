@@ -45,6 +45,14 @@ export const Util = {
     );
   },
 
+  setToMidnight: function(timestamp) {
+    let date = new Date(timestamp);
+    date.setHours(0)
+    date.setMinutes(0)
+    date.setSeconds(0)
+    return date.valueOf();
+  },
+
 
   postData: async function(url = '', data = {}) {
     // Default options are marked with *

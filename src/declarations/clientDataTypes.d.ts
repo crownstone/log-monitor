@@ -25,3 +25,6 @@ interface BluenetPromiseConfig extends DataFlowConfig  {
     showCancelledConnections: boolean
   }
 }
+
+interface UptimeConfig extends DataFlowConfig  {
+}

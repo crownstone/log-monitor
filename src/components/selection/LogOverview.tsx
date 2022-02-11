@@ -67,7 +67,7 @@ function UserLogContainer(props) {
             </Grid>
 
           { itemData.processed &&
-              <Grid item xl={7} onClick={() => { props.removeProcessedData( itemData.date ) }} >
+              <Grid item xl={7} onClick={() => { props.removeProcessedData( itemData.date, itemData.part, ) }} >
                 <Button variant="text" aria-label={"Remove cached data"}>
                   <CloudOff />
                 </Button>

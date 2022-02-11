@@ -13,6 +13,7 @@ export class DataFlowManagerEvents extends DataFlowManagerBase {
 
   loadReboots(data: ParseDataResult) {
     let reboots = data.reboots;
+
     this.eventDataGroups['reboots'] = [];
     if (!reboots) { return }
     for (let reboot of reboots) {

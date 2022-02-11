@@ -13,6 +13,8 @@ export class DataFlowTimeline {
 
   markers = [];
 
+  options : any = {}
+
   constructor(dataFlowManager: DataFlowManagerBase, eventBus: EventBusClass) {
     this.eventBus = eventBus
     this.dataFlowManager = dataFlowManager
@@ -20,7 +22,7 @@ export class DataFlowTimeline {
 
   create(container, options) {
     let customSort =  (a,b) => { return a.content > b.content ? 1 : -1;}
-    let combinedOptions = {...options, groupOrder: this.dataFlowManager.groupOrder ?? customSort}
+    let combinedOptions = {...options, groupOrder: this.dataFlowManager.groupOrder ?? customSort, ...this.options}
     this.timeline = new vis.Timeline(container, this.dataFlowManager.itemDataSet, this.dataFlowManager.groupDataSet, combinedOptions);
 
     this.timeline.on('rangechange',(data) => {

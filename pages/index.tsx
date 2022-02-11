@@ -61,8 +61,8 @@ export default class FileOverview extends React.Component<any, {
   }
 
 
-  async removeProcessedLogData(user, date) {
-    await Util.postData(`http://localhost:3000/api/removeCachedData`, {user: this.state.selectedUser, date: date});
+  async removeProcessedLogData(user, date, part = null) {
+    await Util.postData(`http://localhost:3000/api/removeCachedData`, {user: this.state.selectedUser, date: date, part: part});
   }
 
   async updateLogData() {
@@ -85,9 +85,9 @@ export default class FileOverview extends React.Component<any, {
           <SideBar
             clearFileData={() => {
               this.setState({selectedDate: null, selectedPart: null, totalParts: null});
-              this.db.set('selectedDate', null);
-              this.db.set('selectedPart', null);
-              this.db.set('totalParts', null);
+              this.db.remove('selectedDate');
+              this.db.remove('selectedPart');
+              this.db.remove('totalParts');
               this.db.remove('selectedType');
             }}
             clearTypeData={() => {this.setState({selectedType:null}); this.db.set('selectedType', null)}}
@@ -110,8 +110,8 @@ export default class FileOverview extends React.Component<any, {
               this.db.set('selectedPart', part);
               this.db.set('totalParts', totalParts);
             }}
-            removeProcessedData={async (date) => {
-              await this.removeProcessedLogData(this.state.selectedUser, date);
+            removeProcessedData={async (date, part) => {
+              await this.removeProcessedLogData(this.state.selectedUser, date, part);
               await this.updateLogData();
             }}
           />

@@ -9,7 +9,6 @@ import {
 export default async (req, res) => {
   console.time("Parsing")
   let result : ParseDataResult = {};
-
   if (req.body.path && req.body.stream) {
     await parseCustomFileByLineForStreaming(req.body.path, result);
   }
@@ -17,7 +16,7 @@ export default async (req, res) => {
     await parseCustomFileByLine(req.body.path, result);
   }
   else {
-    await parseConsumerAppFileByLine(req.body.user, req.body.date, result, req.body.part ?? null, req.body.parts ?? null);
+    await parseConsumerAppFileByLine(req.body.user, req.body.date, result, req.body.part, req.body.parts);
   }
 
   console.timeEnd("Parsing")
@@ -25,47 +24,69 @@ export default async (req, res) => {
 
   if (req.body.type === 'cloud') {
     res.end(JSON.stringify({
-      cloud:         result.cloud,
-      reboots:       result.reboots,
-      localization:  result.localization,
-      startTime:     result.startTime,
-      endTime:       result.endTime
+      cloud:            result.cloud,
+      reboots:          result.reboots,
+      scanning:         result.scanning,
+      appState:         result.appState,
+      localization:     result.localization,
+      startTime:        result.startTime,
+      endTime:          result.endTime
     }));
     return;
   }
 
   if (req.body.type === 'constellation') {
     res.end(JSON.stringify({
-      reboots:       result.reboots,
-      constellation: result.constellation,
-      nameMap:       result.nameMap,
-      localization:  result.localization,
-      startTime:     result.startTime,
-      endTime:       result.endTime
+      reboots:          result.reboots,
+      constellation:    result.constellation,
+      nameMap:          result.nameMap,
+      scanning:         result.scanning,
+      appState:         result.appState,
+      localization:     result.localization,
+      startTime:        result.startTime,
+      endTime:          result.endTime
     }));
     return;
   }
 
   if (req.body.type === 'notifications') {
     res.end(JSON.stringify({
-      reboots:       result.reboots,
-      notifications: result.notifications,
-      nameMap:       result.nameMap,
-      localization:  result.localization,
-      startTime:     result.startTime,
-      endTime:       result.endTime
+      reboots:          result.reboots,
+      notifications:    result.notifications,
+      scanning:         result.scanning,
+      appState:         result.appState,
+      nameMap:          result.nameMap,
+      localization:     result.localization,
+      startTime:        result.startTime,
+      endTime:          result.endTime
     }));
     return;
   }
 
   if (req.body.type === 'bluenetPromises') {
     res.end(JSON.stringify({
-      reboots:         result.reboots,
-      bluenetPromises: result.bluenetPromises,
-      nameMap:         result.nameMap,
-      localization:    result.localization,
-      startTime:       result.startTime,
-      endTime:         result.endTime
+      reboots:          result.reboots,
+      bluenetPromises:  result.bluenetPromises,
+      appState:         result.appState,
+      scanning:         result.scanning,
+      nameMap:          result.nameMap,
+      localization:     result.localization,
+      startTime:        result.startTime,
+      endTime:          result.endTime
+    }));
+    return;
+  }
+
+  if (req.body.type === 'uptime') {
+    res.end(JSON.stringify({
+      nameMap:          result.nameMap,
+      reboots:          result.reboots,
+      uptime:           result.uptime,
+      scanning:         result.scanning,
+      appState:         result.appState,
+      localization:     result.localization,
+      startTime:        result.startTime,
+      endTime:          result.endTime
     }));
     return;
   }

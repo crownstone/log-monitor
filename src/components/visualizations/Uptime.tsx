@@ -2,26 +2,28 @@ import React, {useState} from "react";
 import {Backdrop, Button, Checkbox, CircularProgress, FormControlLabel, FormGroup, Grid, Paper} from "@mui/material";
 import {Util} from "../../util/Util";
 import {VisualizationBase} from "./VisualizationBase";
-import {CloudTimeline} from "../timelines/CloudTimeline";
+import {UptimeGraph} from "../timelines/UptimeGraph";
 import {AppStateTimeline} from "../timelines/AppStateTimeline";
+import {ScanningTimeline} from "../timelines/ScanningTimeline";
+import {SphereTimeline} from "../timelines/SphereTimeline";
 
 
-function getCloudConfig() : CloudConfig {
+function getUptimeConfig() : UptimeConfig {
   return {
     dataflow: {
       showRoomLocalization: false,
       showSphereLocalization: false,
     }
-  }
+  };
 }
 
-export class Cloud extends VisualizationBase<CloudConfig> {
-  requestData = null
+export class UptimeVisualization extends VisualizationBase<UptimeConfig> {
+  contentData = null;
 
   constructor(props) {
-    super(props, 'cloud');
+    super(props, 'uptime');
     if (this.config === undefined) {
-      this.config = getCloudConfig();
+      this.config = getUptimeConfig();
     }
   }
 
@@ -29,21 +31,33 @@ export class Cloud extends VisualizationBase<CloudConfig> {
     if (this.state.drawData) {
       return (
         <Grid item style={{height:'100vh', flex:1, overflow:'auto'}}>
+          <ScanningTimeline
+            data={this.data}
+            eventBus={this.eventBus}
+            dataCallback={() => {}}
+            config={this.config}
+          />
+          <SphereTimeline
+            data={this.data}
+            eventBus={this.eventBus}
+            dataCallback={() => {}}
+            config={this.config}
+          />
           <AppStateTimeline
             data={this.data}
             eventBus={this.eventBus}
             dataCallback={() => {}}
             config={this.config}
           />
-          <CloudTimeline
+          <UptimeGraph
             data={this.data}
             eventBus={this.eventBus}
+            dataCallback={() => {}}
             config={this.config}
-            cloudDataCallback={(data) => { this.requestData = data; this.forceUpdate() }}
           />
           <Backdrop open={this.state.showConfig} style={{zIndex:99999}} onClick={() => { this.setState({showConfig: false})}}>
             <Paper style={{maxHeight: '100vh', overflow:'auto', padding:20, width: '50vw'}} onClick={(event) => { event.stopPropagation() }}>
-              <CloudSettings
+              <UptimeSettings
                 config={this.config}
                 close={(config) => {
                   Util.deepExtend(this.config, config)
@@ -54,12 +68,11 @@ export class Cloud extends VisualizationBase<CloudConfig> {
           </Backdrop>
           <Backdrop open={this.state.showHelp} style={{zIndex:99999}} onClick={() => { this.setState({showHelp: false})}}>
             <Paper style={{maxHeight: '100vh', overflow:'auto', padding:20, width: '50vw'}} onClick={(event) => { event.stopPropagation() }}>
-              <CloudHelp />
+              <UptimeHelp />
             </Paper>
           </Backdrop>
 
-          { this.requestData && <RequestDetails request={this.requestData} /> }
-
+          { this.contentData && <p style={{whiteSpace:'pre-wrap'}}>{JSON.stringify(this.contentData, undefined, 2)}</p> }
         </Grid>
       );
     }
@@ -80,31 +93,25 @@ export class Cloud extends VisualizationBase<CloudConfig> {
   }
 }
 
-function RequestDetails(props) {
-  let requestData : CloudRequest = props.request;
-  return (
-    <Grid container flexDirection={"row"}>
-      <Grid item style={{padding:10}} xs={6}>
-        <h3>Request</h3>
-        <p style={{whiteSpace:'pre-wrap'}}>{JSON.stringify(requestData?.request, undefined, 2)}</p>
-      </Grid>
-      <Grid item style={{padding:10}} xs={6}>
-        <h3>{`Reply in ${requestData.tEnd - requestData.tStart}ms`}</h3>
-        <p style={{whiteSpace:'pre-wrap'}}>{JSON.stringify(requestData?.reply, undefined, 2)}</p>
-      </Grid>
-    </Grid>
-  )
-}
+// function Details(props) {
+//   let notification = props.notification;
+//   return (
+//     <Grid container flexDirection={"row"}>
+//       <p style={{whiteSpace:'pre-wrap'}}>{JSON.stringify(notification, undefined, 2)}</p>
+//     </Grid>
+//   )
+// }
 
 
 
-function CloudSettings(props) {
+function UptimeSettings(props) {
+  let [showCancelledConnections, setShowCancelledConnections] = useState(props.config.dataflow.showCancelledConnections);
   let [sphereLevelLocalization, setSphereLevelLocalization] = useState(props.config.dataflow.showSphereLocalization);
   let [roomLevelLocalization,   setRoomLevelLocalization]   = useState(props.config.dataflow.showRoomLocalization);
 
   return (
     <FormGroup>
-      <h1>Cloud visualization settings</h1>
+      <h1>Uptime visualization settings</h1>
       <FormControlLabel control={
         <Checkbox
           onChange={() => { setSphereLevelLocalization(!sphereLevelLocalization)}}
@@ -131,10 +138,10 @@ function CloudSettings(props) {
   )
 }
 
-function CloudHelp(props) {
+function UptimeHelp(props) {
   return (
     <div>
-      <h1>Cloud visualization help</h1>
+      <h1>Uptime visualization help</h1>
       None yet.
     </div>
   )

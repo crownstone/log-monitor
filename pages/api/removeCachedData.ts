@@ -6,7 +6,8 @@ import {FileUtil} from "../../src/util/FileUtil";
 export default async (req, res) => {
   let user = req.body.user;
   let date = req.body.date;
-  FileUtil.removeProcessedData(user,date)
+  let part = req.body.part;
+  FileUtil.removeProcessedData(user,date,part)
   res.end('{}')
 }
 

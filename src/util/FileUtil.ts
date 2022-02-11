@@ -112,8 +112,15 @@ export const FileUtil = {
   },
 
 
-  removeProcessedData(user,date) {
-    let filePath = path.join(USER_PATH, user, 'processed', `CrownstoneAppLog${date}.log`);
+  removeProcessedData(user,date, part = null) {
+    let filePath;
+    if (part === null) {
+      filePath = path.join(USER_PATH, user, 'processed', `CrownstoneAppLog${date}.log`);
+    }
+    else {
+      filePath = path.join(USER_PATH, user, 'processed', `CrownstoneAppLog${date}_p${part}.log`);
+    }
+
     return fs.rmSync(filePath);
   },
 

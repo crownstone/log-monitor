@@ -31,10 +31,9 @@ export function getLineCount(path) {
 
 export async function parseConsumerAppFileByLine(user, date, result, part: number = null, parts: number = null, force= false) {
     // use cached data.
-    if (force === false && false) {
+    if (force === false) {
       let processedData = FileUtil.getProcessedData(user, date, part);
       if (processedData) {
-        console.log("USING CACHE")
         // shallow copy into result
         for (let key in processedData) {
           result[key] = processedData[key];
@@ -45,7 +44,8 @@ export async function parseConsumerAppFileByLine(user, date, result, part: numbe
 
     let filePath = FileUtil.getFilePath(user,date);
     let startLine = 0;
-    let endLine = 0;
+    let endLine   = 0;
+
 
     if (part !== null) {
       let amountOfLines = await getLineCount(filePath)
@@ -93,17 +93,18 @@ export async function parseCustomFileByLineForStreaming(filePath, result) {
 function _parseAppLog(filePath: string, result: ParseDataResult, startLine: number = 0, endLine: number = 0) {
   return new Promise<void>((resolve, reject) => {
     const file = FileUtil.getFileStream(filePath);
+    let nameMapParser = new NameMapParser(result);
     let parsers = [
-      // new NameMapParser(result),
-      // new NotificationParser(result),
+      nameMapParser,
+      new NotificationParser(result),
       new UptimeParser(result),
-      // new ScanningParser(result),
+      new ScanningParser(result),
       new AppStateParser(result),
-      // new RebootParser(result),
-      // new BluenetPromiseParser(result),
-      // new ConstellationParser(result),
-      // new LocalizationParser(result),
-      // new CloudParser(result),
+      new RebootParser(result),
+      new BluenetPromiseParser(result),
+      new ConstellationParser(result),
+      new LocalizationParser(result),
+      new CloudParser(result),
     ];
     let total = 0;
     let firstTime = null;
@@ -119,12 +120,12 @@ function _parseAppLog(filePath: string, result: ParseDataResult, startLine: numb
       let item = [Number(line.substr(0,13)), line];
 
       if (startLine > total) {
-        parsers[0].load(item);
+        nameMapParser.load(item);
         return;
       }
 
       if (total > endLine && endLine > 0) {
-        parsers[0].load(item);
+        nameMapParser.load(item);
         return;
       }
 

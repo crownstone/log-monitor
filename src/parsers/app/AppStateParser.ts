@@ -23,7 +23,7 @@ export class AppStateParser extends BaseParser {
   handleParseResult(item, parser, parseResult) {
     switch (parser.type) {
       case 'app state':
-        this.data.push({time: item[0], state: parseResult.state}); break;
+        this.data.push({t: item[0], state: parseResult.state}); break;
     }
 
     return true;

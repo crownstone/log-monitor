@@ -26,6 +26,11 @@ export class GlobalStateKeeper {
   }
 
   set(key, value, storeLastSet = true) {
+    if (value === undefined || value === null) {
+      return this.remove(key)
+    }
+
+
     let type = typeof value;
     if (type === "object") {
       value = JSON.stringify(value);

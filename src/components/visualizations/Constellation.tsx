@@ -4,6 +4,9 @@ import {SessionTimeline} from "../timelines/SessionTimeline";
 import {CommanderTimeline} from "../timelines/CommanderTimeline";
 import {Util} from "../../util/Util";
 import {VisualizationBase} from "./VisualizationBase";
+import {AppStateTimeline} from "../timelines/AppStateTimeline";
+import {SphereTimeline} from "../timelines/SphereTimeline";
+import {ScanningTimeline} from "../timelines/ScanningTimeline";
 
 
 function getConstellationConfig() : ConstellationConfig {
@@ -30,6 +33,24 @@ export class Constellation extends VisualizationBase<ConstellationConfig> {
     if (this.state.drawData) {
       return (
         <Grid item style={{height:'100vh', flex:1, overflow:'auto'}}>
+          <ScanningTimeline
+            data={this.data}
+            eventBus={this.eventBus}
+            dataCallback={() => {}}
+            config={this.config}
+          />
+          <SphereTimeline
+            data={this.data}
+            eventBus={this.eventBus}
+            dataCallback={() => {}}
+            config={this.config}
+          />
+          <AppStateTimeline
+            data={this.data}
+            eventBus={this.eventBus}
+            dataCallback={() => {}}
+            config={this.config}
+          />
           <SessionTimeline   data={this.data} eventBus={this.eventBus} />
           <CommanderTimeline data={this.data} eventBus={this.eventBus} config={this.config} />
           <Backdrop open={this.state.showConfig} style={{zIndex:99999}} onClick={() => { this.setState({showConfig: false})}}>

@@ -34,14 +34,11 @@ export function TypeOverview(props) {
         <Button onClick={() => { props.select('BluenetPromises')}}>BluenetPromises</Button>
       </Grid>
       <Grid item ml={2}>
-        <Button onClick={() => { props.select('Scanning')}}>Scanning</Button>
+        <Button onClick={() => { props.select('ScanningAndUptime')}}>Uptime & Scanning</Button>
       </Grid>
-      <Grid item ml={2}>
-        <Button onClick={() => { props.select('Connections')}}>Connections</Button>
-      </Grid>
-      <Grid item ml={2}>
-        <Button onClick={() => { props.select('Uptime')}}>Uptime</Button>
-      </Grid>
+      {/*<Grid item ml={2}>*/}
+      {/*  <Button onClick={() => { props.select('Connections')}}>Connections</Button>*/}
+      {/*</Grid>*/}
     </Grid>
   )
 }

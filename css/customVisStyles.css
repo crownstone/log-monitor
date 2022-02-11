@@ -82,3 +82,31 @@
     stroke-width:2px;
     stroke: #4f81bd;
 }
+.uptimePoints {
+    fill:#4f81bd;
+    fill-opacity:0;
+    stroke-width:1px;
+    stroke: #4f81bd;
+}
+
+
+.vis-item.green {
+    background-color: #b1eb76;
+    border-width:1px;
+    border-color: #779e4f;
+}
+.vis-item.orange {
+    background-color: #eea23b;
+    border-width:1px;
+    border-color: #d48435;
+}
+.vis-item.blue {
+    background-color: #60a8f0;
+    border-width:1px;
+    border-color: #3a5e8a;
+}
+.vis-item.gray {
+    background-color: #ccc;
+    border-width:1px;
+    border-color: #aaa;
+}

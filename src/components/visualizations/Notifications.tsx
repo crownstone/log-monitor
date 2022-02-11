@@ -3,6 +3,7 @@ import {Backdrop, Button, Checkbox, CircularProgress, FormControlLabel, FormGrou
 import {Util} from "../../util/Util";
 import {VisualizationBase} from "./VisualizationBase";
 import {NotificationsTimeline} from "../timelines/NotificationsTimeline";
+import {AppStateTimeline} from "../timelines/AppStateTimeline";
 
 
 function getNotificationConfig() : NotificationConfig {
@@ -29,6 +30,12 @@ export class Notifications extends VisualizationBase<NotificationConfig> {
     if (this.state.drawData) {
       return (
         <Grid item style={{height:'100vh', flex:1, overflow:'auto'}}>
+          <AppStateTimeline
+            data={this.data}
+            eventBus={this.eventBus}
+            dataCallback={() => {}}
+            config={this.config}
+          />
           <NotificationsTimeline
             data={this.data}
             eventBus={this.eventBus}
