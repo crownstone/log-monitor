@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "parse": "node ./actions/parseData.js"
+    "parse": "node ./actions/parseData.js",
+    "clearProcessed": "node ./scripts/removeProcessed.js"
   },
   "dependencies": {
     "@emotion/react": "^11.5.0",

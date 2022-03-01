@@ -8,6 +8,7 @@ interface ParseDataResult {
   cloud?:           CloudParseResult,
   notifications?:   NotificationsParseResult,
   bluenetPromises?: BluenetPromisesParseResult,
+  eventBus?:        EventParseResult,
 
   uptime?:          UptimeParseResult,
   appState?:        AppStateParseResult[],
@@ -30,6 +31,13 @@ interface ScanningParseResult {
   state: 'startScanning' | 'startBatterySaving'
 }
 
+
+interface EventParseResult {
+  [eventBusType: sting]: {
+    topics: {[topicId: string]: {t:number, y: number}[]},
+    count:  {t:number, y: number}[]
+  }
+}
 
 interface AppStateParseResult {
   t: number,

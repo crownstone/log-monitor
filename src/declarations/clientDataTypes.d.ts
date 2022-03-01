@@ -9,6 +9,10 @@ interface DataFlowConfig {
   dataflow?: DataFlowOptions
 }
 
+interface EventsConfig extends DataFlowConfig {
+}
+
+
 interface ConstellationConfig extends DataFlowConfig {
 }
 

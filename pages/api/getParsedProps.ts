@@ -20,7 +20,7 @@ export default async (req, res) => {
   }
 
   console.timeEnd("Parsing")
-
+  console.log("Requesting for type", req.body.type);
 
   if (req.body.type === 'cloud') {
     res.end(JSON.stringify({
@@ -91,5 +91,20 @@ export default async (req, res) => {
     return;
   }
 
+  if (req.body.type === 'events') {
+    res.end(JSON.stringify({
+      nameMap:          result.nameMap,
+      reboots:          result.reboots,
+      eventBus:         result.eventBus,
+      appState:         result.appState,
+      localization:     result.localization,
+      startTime:        result.startTime,
+      endTime:          result.endTime
+    }));
+    return;
+  }
+
+
+  console.error("Nothing returned!")
 }
 

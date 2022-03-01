@@ -85,6 +85,7 @@ export class VisualizationBase<T> extends React.Component<
       part:  this.props.part,
       parts: this.props.parts,
     });
+    console.log("this.data", this.data)
     SharedEventBus.emit("PARSED_DATA");
     this.setState({loadedData:true});
     setTimeout(() => { this.setState({drawData: true})}, 100);
@@ -106,6 +107,7 @@ export class VisualizationBase<T> extends React.Component<
       part:   this.props.part,
       parts:  this.props.parts,
     });
+    console.log("this.data 2", this.data)
     this.eventBus.emit("NEW_DATA", this.data);
     if (this.props.stream) {
       clearTimeout(this.streamTimeout);

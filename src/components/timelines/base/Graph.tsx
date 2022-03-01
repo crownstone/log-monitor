@@ -2,10 +2,9 @@ import React from "react";
 import {Backdrop, Paper} from "@mui/material";
 import {EventBusClass} from "../../../util/EventBus";
 import {DataFlowGraph} from "./../DataFlowGraph";
-import {UptimeDataFlowManager} from "../../../logic/DataFlowManager_uptime";
 import {DataFlowManagerBase} from "../../../logic/DataFlowManagerBase";
 
-export class Graph<T> extends React.Component<{ data: ParseDataResult, eventBus: EventBusClass, dataCallback: (d) => void, config: T }, { overlayContent: any | null }> {
+export class Graph<T> extends React.Component<{ data: ParseDataResult, eventBus: EventBusClass, dataCallback?: (d) => void, config: T, bus? }, { overlayContent: any | null }> {
 
   dataFlowGraph: DataFlowGraph;
   dataFlowManager: DataFlowManagerBase;
@@ -38,6 +37,7 @@ export class Graph<T> extends React.Component<{ data: ParseDataResult, eventBus:
     var options = {
       interpolation: false,
       dataAxis: { width: 300 },
+      legend: true,
       ...this.options,
     };
 

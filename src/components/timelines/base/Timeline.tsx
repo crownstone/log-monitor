@@ -4,7 +4,7 @@ import {EventBusClass} from "../../../util/EventBus";
 import {DataFlowTimeline} from "../DataFlowTimeline";
 import {DataFlowManagerBase} from "../../../logic/DataFlowManagerBase";
 
-export class Timeline<T> extends React.Component<{ data: ParseDataResult, eventBus: EventBusClass, dataCallback: (d) => void, config: T }, { overlayContent: any | null }> {
+export class Timeline<T> extends React.Component<{ data: ParseDataResult, eventBus: EventBusClass, dataCallback?: (d) => void, config: T }, { overlayContent: any | null }> {
 
   dataFlowTimeline: DataFlowTimeline;
   dataFlowManager: DataFlowManagerBase;

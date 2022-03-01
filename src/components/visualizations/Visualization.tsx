@@ -4,6 +4,7 @@ import {Cloud}           from "./Cloud";
 import {Notifications}   from "./Notifications";
 import {BluenetPromises} from "./BluenetPromises";
 import {UptimeVisualization} from "./Uptime";
+import {Events} from "./Events";
 
 export function Visualization(props : {
   user?:   string,
@@ -25,6 +26,8 @@ export function Visualization(props : {
       return <BluenetPromises {...props} />
     case "ScanningAndUptime":
       return <UptimeVisualization {...props} />
+    case "Events":
+      return <Events {...props} />
     default:
       return <div>Not implemented yet..</div>
   }

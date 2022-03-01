@@ -9,6 +9,7 @@ import {BluenetPromiseParser} from "./app/BluenetPromiseParser";
 import {UptimeParser} from "./app/UptimeParser";
 import {ScanningParser} from "./app/ScanningParser";
 import { AppStateParser } from "./app/AppStateParser";
+import {EventCountParser} from "./app/EventCountParser";
 
 
 export function getLineCount(path) {
@@ -100,6 +101,7 @@ function _parseAppLog(filePath: string, result: ParseDataResult, startLine: numb
       new UptimeParser(result),
       new ScanningParser(result),
       new AppStateParser(result),
+      new EventCountParser(result),
       new RebootParser(result),
       new BluenetPromiseParser(result),
       new ConstellationParser(result),
