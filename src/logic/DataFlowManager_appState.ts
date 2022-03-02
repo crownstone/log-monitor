@@ -1,4 +1,3 @@
-import {DataFlowManagerBase} from "./DataFlowManagerBase";
 import {EventBusClass} from "../util/EventBus";
 import {Util} from "../util/Util";
 import {DataFlowManagerEvents} from "./DataFlowManager_events";
@@ -6,10 +5,12 @@ import {DataFlowManagerEvents} from "./DataFlowManager_events";
 export class AppStateDataFlowManager extends DataFlowManagerEvents {
 
   options : any;
+  groupWidth : number;
 
-  constructor(eventBus : EventBusClass, options : UptimeConfig = {}) {
+  constructor(eventBus : EventBusClass, options : UptimeConfig = {}, groupWidth: number = 300) {
     super(eventBus);
     this.options = options?.dataflow ?? {};
+    this.groupWidth = groupWidth;
   }
 
   itemThreshold = 100000;
@@ -78,7 +79,7 @@ export class AppStateDataFlowManager extends DataFlowManagerEvents {
     this.loadReboots(data)
 
 
-    this.groupDataSet.update({id: 'appState', content: 'App background state', style:'width: 300px'});
+    this.groupDataSet.update({id: 'appState', content: 'App background state', style:`width: ${this.groupWidth}px`});
   }
 
 }

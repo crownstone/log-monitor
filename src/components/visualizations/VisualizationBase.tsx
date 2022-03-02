@@ -77,7 +77,7 @@ export class VisualizationBase<T> extends React.Component<
 
 
   async init() {
-    this.data = await Util.postData(`http://localhost:3000/api/getParsedProps`, {
+    this.data = await Util.postData(`http://localhost:3200/api/getParsedProps`, {
       path:  this.props.path,
       user:  this.props.user,
       date:  this.props.date,
@@ -98,7 +98,7 @@ export class VisualizationBase<T> extends React.Component<
   }
 
   async update() {
-    this.data = await Util.postData(`http://localhost:3000/api/getParsedProps`, {
+    this.data = await Util.postData(`http://localhost:3200/api/getParsedProps`, {
       path:   this.props.path,
       stream: this.props.stream,
       user:   this.props.user,

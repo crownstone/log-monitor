@@ -12,11 +12,12 @@ export class AppStateTimeline extends Timeline<any> {
   options = {
     showMajorLabels: false,
     showMinorLabels: false,
+
   }
 
   constructor(props) {
     super(props);
-    this.dataFlowManager  = new AppStateDataFlowManager(this.props.eventBus, this.props.config);
+    this.dataFlowManager  = new AppStateDataFlowManager(this.props.eventBus, this.props.config, this.props.groupWidth);
     this.dataFlowTimeline = new DataFlowTimeline(this.dataFlowManager, this.props.eventBus);
     this.dataFlowTimeline.options = this.options;
   }

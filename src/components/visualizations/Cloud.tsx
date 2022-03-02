@@ -34,6 +34,7 @@ export class Cloud extends VisualizationBase<CloudConfig> {
             eventBus={this.eventBus}
             dataCallback={() => {}}
             config={this.config}
+            groupWidth={430}
           />
           <CloudTimeline
             data={this.data}

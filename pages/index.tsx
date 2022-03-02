@@ -62,11 +62,11 @@ export default class FileOverview extends React.Component<any, {
 
 
   async removeProcessedLogData(user, date, part = null) {
-    await Util.postData(`http://localhost:3000/api/removeCachedData`, {user: this.state.selectedUser, date: date, part: part});
+    await Util.postData(`http://localhost:3200/api/removeCachedData`, {user: this.state.selectedUser, date: date, part: part});
   }
 
   async updateLogData() {
-    let updatedData = await Util.postData(`http://localhost:3000/api/getAvailableLogs`,{});
+    let updatedData = await Util.postData(`http://localhost:3200/api/getAvailableLogs`,{});
     this.setState({logs:updatedData});
   }
 
