@@ -6,6 +6,7 @@ interface ParseDataResult {
   nameMap?:         NameMap,
   localization?:    LocalizationParseResult,
   cloud?:           CloudParseResult,
+  store?:           StoreParseResult,
   notifications?:   NotificationsParseResult,
   bluenetPromises?: BluenetPromisesParseResult,
   eventBus?:        EventParseResult,
@@ -72,6 +73,10 @@ interface NotificationsParseResult {
       content: any
     }[]
   }
+}
+
+interface StoreParseResult {
+  actions: { t: timestamp, action: any }[]
 }
 
 interface CloudParseResult {

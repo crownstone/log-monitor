@@ -28,6 +28,9 @@ export function TypeOverview(props) {
         <Button onClick={() => { props.select('Cloud')}}>Cloud</Button>
       </Grid>
       <Grid item ml={2}>
+        <Button onClick={() => { props.select('Store')}}>Store</Button>
+      </Grid>
+      <Grid item ml={2}>
         <Button onClick={() => { props.select('Notifications')}}>Notifications</Button>
       </Grid>
       <Grid item ml={2}>
