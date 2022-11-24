@@ -1,7 +1,7 @@
 import React from "react";
 import {AppStateDataFlowManager} from "../../logic/DataFlowManager_appState";
-import {Timeline} from "./base/Timeline";
 import {DataFlowTimeline} from "./DataFlowTimeline";
+import {Timeline} from "./base/Timeline";
 
 export class AppStateTimeline extends Timeline<any> {
 

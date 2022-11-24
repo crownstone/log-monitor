@@ -63,6 +63,11 @@ export class CommanderDataFlowManager extends DataFlowManagerEvents {
         if (!this.rangeDataGroups[this.commanderType]) {
           this.rangeDataGroups[this.commanderType] = [];
         }
+        if (!commander.phases[1]) {
+          console.warn("commander Error:", commander)
+          continue;
+        }
+
         this.rangeDataGroups[this.commanderType].push({
           id:      commanderId,
           start:   commander.tStart,
