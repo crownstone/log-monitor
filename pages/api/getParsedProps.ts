@@ -22,6 +22,20 @@ export default async (req, res) => {
   console.timeEnd("Parsing")
   console.log("Requesting for type", req.body.type);
 
+  if (req.body.type === 'store') {
+    res.end(JSON.stringify({
+      cloud:            result.cloud,
+      reboots:          result.reboots,
+      scanning:         result.scanning,
+      store:            result.store,
+      appState:         result.appState,
+      localization:     result.localization,
+      startTime:        result.startTime,
+      endTime:          result.endTime
+    }));
+    return;
+  }
+
   if (req.body.type === 'cloud') {
     res.end(JSON.stringify({
       cloud:            result.cloud,

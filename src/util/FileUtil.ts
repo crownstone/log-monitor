@@ -47,6 +47,10 @@ export const FileUtil = {
 
 
   getDirectories: function(inPath) : string[] {
+    if (fs.existsSync(inPath) === false) {
+      fs.mkdirSync(inPath);
+    }
+
     let items =  fs.readdirSync(inPath);
     let result : string[] = [];
     for (let item of items) {

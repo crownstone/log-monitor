@@ -1,6 +1,7 @@
 import React from "react";
 import {Constellation}   from "./Constellation";
 import {Cloud}           from "./Cloud";
+import {Store}           from "./Store";
 import {Notifications}   from "./Notifications";
 import {BluenetPromises} from "./BluenetPromises";
 import {UptimeVisualization} from "./Uptime";
@@ -20,6 +21,8 @@ export function Visualization(props : {
       return <Constellation {...props} />
     case "Cloud":
       return <Cloud {...props} />
+    case "Store":
+      return <Store {...props} />
     case "Notifications":
       return <Notifications {...props} />
     case "BluenetPromises":
